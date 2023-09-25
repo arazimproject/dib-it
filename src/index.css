@@ -1,0 +1,200 @@
+:root {
+  --accent: rgb(79, 101, 34);
+  --secondary: rgb(232, 201, 142);
+  --accent-gradient: linear-gradient(
+    45deg,
+    var(--accent),
+    rgb(232, 201, 142) 30%,
+    white 60%
+  );
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+html,
+body,
+#root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  height: 100%;
+  line-height: 1.5;
+}
+
+#schedule-container * {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+}
+
+#schedule-container > div > div {
+  font-size: 14px;
+  margin-top: 0 !important;
+  line-height: 1;
+}
+
+#schedule-container > div > div {
+  direction: rtl;
+  margin-right: 1px !important;
+}
+
+#schedule-container.wide > div > div > div > div:has(> div) {
+  overflow: auto !important;
+}
+
+#schedule-container > div > div > div > div > :first-child {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  body,
+  #root {
+    background-color: #222;
+    color: white;
+  }
+
+  #schedule-container > div > div {
+    color: white !important;
+  }
+
+  #schedule-container > div > div:empty {
+    opacity: 0.2;
+  }
+
+  #schedule-container > div > div > div > div > div {
+    filter: brightness(233%);
+  }
+}
+
+#main {
+  flex-direction: column;
+}
+
+.adaptive-flex {
+  flex-direction: column;
+}
+
+@media only screen and (min-width: 800px) {
+  .adaptive-flex {
+    flex-direction: row;
+  }
+
+  #main {
+    flex-direction: row;
+  }
+
+  #content {
+    overflow-y: auto;
+    flex-grow: 1;
+    flex: auto;
+    margin-right: 10px;
+    margin-top: 10px;
+  }
+
+  #content > :nth-child(2) {
+    max-height: 90%;
+    overflow-y: auto;
+  }
+
+  #sidebar {
+    width: 325px;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  #sidebar {
+    width: 350px;
+  }
+}
+
+@media only screen and (min-width: 1400px) {
+  #sidebar {
+    width: 400px;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .dont-print {
+    display: none !important;
+  }
+}
+
+:root {
+  --animation-length: 750ms;
+}
+
+.logo {
+  animation: fade-in var(--animation-length) ease-in-out;
+}
+
+@keyframes fade-in {
+  0% {
+    transform: translate3d(0, 20px, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 730px) {
+  .footer > p {
+    font-size: 9pt;
+  }
+
+  .show-wide {
+    display: none;
+  }
+}
+
+.footer a {
+  margin-inline-start: 5px;
+}
+
+.text-accent {
+  color: var(--accent) !important;
+}
+
+.link {
+  transition: 100ms ease-in-out;
+  display: inline-block;
+}
+
+.link:hover {
+  transform: scale(1.03);
+}
+
+.handle::before {
+  content: "\f0c1";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  margin-inline-end: 5px;
+}
+
+.card {
+  transition: 300ms ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.015);
+}
