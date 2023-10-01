@@ -2,6 +2,7 @@ import * as ics from "ics"
 import { Course } from "./CourseInfoContext"
 import { getLocalStorage, setLocalStorage } from "./hooks"
 import semesterInfo from "./semesterInfo"
+import { parseDateString } from "./utilities"
 
 /**
  * Restore the application state from the given JSON.
@@ -55,8 +56,30 @@ export const getICS = (
         continue
       }
 
+      for (const exam of course.exam_dates) {
+        const date = parseDateString(exam.date)
+        if (date === undefined) {
+          continue
+        }
+
+        events.push({
+          title: `${course.name} (מועד ${exam.moed})`,
+          start: [
+            date.getFullYear(),
+            date.getMonth() + 1,
+            date.getDate(),
+            0,
+            0,
+          ],
+          duration: { hours: 24 },
+        })
+      }
+
       for (const group of course.groups) {
-        if (!chosenGroups[courseName].includes(group.group)) {
+        if (
+          chosenGroups[courseName] === undefined ||
+          !chosenGroups[courseName].includes(group.group)
+        ) {
           continue
         }
 
