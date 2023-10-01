@@ -72,7 +72,6 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
       }}
     >
       <Select
-        size="md"
         mb={10}
         value={semester}
         onChange={(v) => setSemester(v!)}

@@ -131,6 +131,7 @@ const CourseCard: React.FC<Props> = ({
       ))}
       <ColorInput
         dir="ltr"
+        size="md"
         label="בחירת צבע"
         value={courseColor}
         styles={{

@@ -117,6 +117,7 @@ const StudyPlan = () => {
       {plans[school] !== undefined && (
         <Autocomplete
           mt="xs"
+          size="md"
           label="תוכנית לימוד"
           icon={<i className="fa-solid fa-book" />}
           data={Object.keys(plans[school]).sort()}
