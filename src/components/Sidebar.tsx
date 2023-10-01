@@ -2,10 +2,13 @@ import { Autocomplete, Button, Select } from "@mantine/core"
 import { useState } from "react"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage } from "../hooks"
+import semesterInfo from "../semesterInfo"
 import { getICS, restore, save } from "../serialize"
 import { downloadFile, uploadJson } from "../utilities"
 import CourseCard from "./CourseCard"
 import GoogleSaveButtons from "./GoogleSaveButtons"
+import plansRaw from "./plans.json"
+const plans: Record<string, Record<string, string[]>> = plansRaw
 
 interface Props {
   semester: string
@@ -20,8 +23,31 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
     defaultValue: [],
   })
 
+  const [studyPlan] = useLocalStorage<string>({
+    key: "Study Plan",
+    serialize: true,
+    defaultValue: "",
+  })
+  const [showOnlyStudyPlan] = useLocalStorage<boolean>({
+    key: "Show Only Plan Courses",
+    defaultValue: false,
+  })
+
   if (courses?.length === undefined) {
     courses = []
+  }
+
+  const possiblyFilterPlanOnly = (courses: string[]) => {
+    if (showOnlyStudyPlan && plans[studyPlan] !== undefined) {
+      const courseSet = new Set()
+      for (const part in plans[studyPlan]) {
+        for (const course of plans[studyPlan][part]) {
+          courseSet.add(course)
+        }
+      }
+      return courses.filter((c) => courseSet.has(c))
+    }
+    return courses
   }
 
   return (
@@ -41,10 +67,9 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         mb={10}
         value={semester}
         onChange={(v) => setSemester(v!)}
-        data={[
-          { value: "2024a", label: "תשפ״ד א׳" },
-          { value: "2024b", label: "תשפ״ד ב׳" },
-        ]}
+        data={Object.keys(semesterInfo)
+          .sort()
+          .map((key) => ({ value: key, label: semesterInfo[key].name }))}
         label="סמסטר"
         icon={<i className="fa-solid fa-cloud-moon" />}
       />
@@ -116,9 +141,10 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
             setSearch(courseName)
           }
         }}
-        data={(courses.includes !== undefined
-          ? Object.keys(courseInfo).filter((id) => !courses.includes(id))
-          : Object.keys(courseInfo)
+        data={possiblyFilterPlanOnly(
+          courses.includes !== undefined
+            ? Object.keys(courseInfo).filter((id) => !courses.includes(id))
+            : Object.keys(courseInfo)
         ).map((id) => `${courseInfo[id]?.name} (${id})`)}
         icon={<i className="fa-solid fa-search" />}
         placeholder="חיפוש"

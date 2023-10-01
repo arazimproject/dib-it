@@ -16,6 +16,7 @@ import Schedule from "./components/Schedule"
 import Sidebar from "./components/Sidebar"
 import StudyPlan from "./components/StudyPlan"
 import { getLocalStorage, setLocalStorage, useLocalStorage } from "./hooks"
+import { currentSemester } from "./semesterInfo"
 
 export const rtlCache = createEmotionCache({
   key: "mantine-rtl",
@@ -71,7 +72,7 @@ const App = () => {
   const [courses, setCourses] = useState<Record<string, Course>>({})
   const [semester, setSemester] = useLocalStorage<string>({
     key: "Semester",
-    defaultValue: "2024a",
+    defaultValue: currentSemester,
   })
   const [chosenGroups] = useLocalStorage<Record<string, string[]>>({
     key: "Groups",
@@ -82,14 +83,18 @@ const App = () => {
 
   useEffect(() => {
     if (semester) {
-      setCourses({})
+      const localStorageKey = "Cached Courses for " + semester
+      setCourses(getLocalStorage(localStorageKey))
       fetch(
         `/courses/${semester}.json?date=${encodeURIComponent(
           new Date().toDateString()
         )}`
       )
         .then((r) => r.json())
-        .then(setCourses)
+        .then((result) => {
+          setCourses(result)
+          setLocalStorage(localStorageKey, result)
+        })
         .catch(() => {})
     }
   }, [semester])
@@ -141,6 +146,7 @@ const App = () => {
                   style={{
                     display: "flex",
                     alignItems: "center",
+                    marginBottom: 5,
                   }}
                 >
                   <Button.Group

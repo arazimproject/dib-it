@@ -210,6 +210,4 @@ const CourseCard: React.FC<Props> = ({
   )
 }
 
-// lstFacBidd=0300&lstShana=2023&sem=1&ritza=1&txtKurs=03661111&txtKursName=&lstPageSize=15&show=%D7%94%D7%A6%D7%92%D7%94
-
 export default CourseCard

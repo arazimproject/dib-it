@@ -3,7 +3,8 @@ import { useCourseInfo } from "../CourseInfoContext"
 import hash from "../color-hash"
 import { useLocalStorage } from "../hooks"
 import { getClosestValue, parseDateString } from "../utilities"
-import plans from "./plans.json"
+import plansRaw from "./plans.json"
+const plans: Record<string, Record<string, string[]>> = plansRaw
 
 const StudyPlan = () => {
   const [studyPlan, setStudyPlan] = useLocalStorage<string>({
@@ -22,6 +23,11 @@ const StudyPlan = () => {
     key: "Study Plan Sorted",
     defaultValue: false,
   })
+  const [showOnlyPlanCourses, setShowOnlyPlanCourses] =
+    useLocalStorage<boolean>({
+      key: "Show Only Plan Courses",
+      defaultValue: false,
+    })
 
   const courseInfo = useCourseInfo()
 
@@ -108,10 +114,14 @@ const StudyPlan = () => {
         checked={sorted}
         onChange={(e) => setSorted(e.currentTarget.checked)}
       />
+      <Switch
+        mt="xs"
+        label="הצג רק קורסים מהתוכנית בחיפוש"
+        checked={showOnlyPlanCourses}
+        onChange={(e) => setShowOnlyPlanCourses(e.currentTarget.checked)}
+      />
 
-      {/* @ts-ignore */}
       {plans[studyPlan] !== undefined &&
-        // @ts-ignore
         Object.keys(plans[studyPlan]).map((key) => {
           const textColor = hash.hsl(key)[2] > 0.5 ? "black" : "white"
 
@@ -133,7 +143,6 @@ const StudyPlan = () => {
             >
               <h2 style={{ marginBottom: 10 }}>{key}</h2>
               {possiblySort(
-                // @ts-ignore
                 plans[studyPlan][key].filter(
                   (courseId: string) => courseInfo[courseId] !== undefined
                 )
