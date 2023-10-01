@@ -1,12 +1,24 @@
-import { Badge, Button, Checkbox, Select, Switch } from "@mantine/core"
+import {
+  Autocomplete,
+  Badge,
+  Button,
+  Checkbox,
+  Select,
+  Switch,
+} from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import hash from "../color-hash"
 import { useLocalStorage } from "../hooks"
 import { getClosestValue, parseDateString } from "../utilities"
 import plansRaw from "./plans.json"
-const plans: Record<string, Record<string, string[]>> = plansRaw
+const plans: Record<string, Record<string, Record<string, string[]>>> = plansRaw
 
 const StudyPlan = () => {
+  const [school, setSchool] = useLocalStorage<string>({
+    key: "School",
+    serialize: true,
+    defaultValue: "",
+  })
   const [studyPlan, setStudyPlan] = useLocalStorage<string>({
     key: "Study Plan",
     serialize: true,
@@ -48,38 +60,31 @@ const StudyPlan = () => {
     courseDates.sort()
   }
 
+  const getSortingValue = (courseId: string) => {
+    if (takenCourses[courseId]) {
+      return 1000
+    }
+    if (courses.includes(courseId)) {
+      return 999
+    }
+
+    const date = courseInfo[courseId]!.exam_dates
+    if (date.length === 0) {
+      return -1000
+    }
+
+    if (courseDates.length === 0) {
+      return 0
+    }
+
+    const time = parseDateString(date[0].date)?.getTime() ?? 0
+    const difference = Math.abs(getClosestValue(time, courseDates) - time)
+    return -difference
+  }
+
   const possiblySort = (a: string[]) => {
     if (sorted) {
-      a.sort((x, y) => {
-        const xDate = courseInfo[x]!.exam_dates
-        if (xDate.length === 0) {
-          return -1
-        }
-        const yDate = courseInfo[y]!.exam_dates
-        if (yDate.length === 0) {
-          return 1
-        }
-
-        if (takenCourses[x]) {
-          return 1
-        }
-
-        if (takenCourses[y]) {
-          return -1
-        }
-
-        const xTime = parseDateString(xDate[0].date)?.getTime() ?? 0
-        const yTime = parseDateString(yDate[0].date)?.getTime() ?? 0
-
-        const xDifference = Math.abs(
-          getClosestValue(xTime, courseDates) - xTime
-        )
-        const yDifference = Math.abs(
-          getClosestValue(yTime, courseDates) - yTime
-        )
-
-        return yDifference - xDifference
-      })
+      a.sort((x, y) => getSortingValue(x) - getSortingValue(y))
     }
 
     return a
@@ -96,18 +101,32 @@ const StudyPlan = () => {
       <p style={{ marginTop: 5 }}>
         מוצגים ברשימה רק קורסים שמועברים בסמסטר הקרוב.
       </p>
+
       <Select
         mt="xs"
-        label="תוכנית לימוד"
-        icon={<i className="fa-solid fa-book" />}
+        label="פקולטה"
+        icon={<i className="fa-solid fa-school" />}
         data={Object.keys(plans).sort()}
-        value={studyPlan}
+        value={school}
         onChange={(e) => {
           if (e) {
-            setStudyPlan(e)
+            setSchool(e)
           }
         }}
       />
+      {plans[school] !== undefined && (
+        <Autocomplete
+          mt="xs"
+          label="תוכנית לימוד"
+          icon={<i className="fa-solid fa-book" />}
+          data={Object.keys(plans[school]).sort()}
+          value={studyPlan}
+          onChange={setStudyPlan}
+          limit={20}
+          maxDropdownHeight={200}
+        />
+      )}
+
       <Switch
         mt="xs"
         label="מיון לפי השתלבות במבחנים"
@@ -121,8 +140,9 @@ const StudyPlan = () => {
         onChange={(e) => setShowOnlyPlanCourses(e.currentTarget.checked)}
       />
 
-      {plans[studyPlan] !== undefined &&
-        Object.keys(plans[studyPlan]).map((key) => {
+      {plans[school] !== undefined &&
+        plans[school][studyPlan] !== undefined &&
+        Object.keys(plans[school][studyPlan]).map((key) => {
           const textColor = hash.hsl(key)[2] > 0.5 ? "black" : "white"
 
           return (
@@ -143,7 +163,7 @@ const StudyPlan = () => {
             >
               <h2 style={{ marginBottom: 10 }}>{key}</h2>
               {possiblySort(
-                plans[studyPlan][key].filter(
+                plans[school][studyPlan][key].filter(
                   (courseId: string) => courseInfo[courseId] !== undefined
                 )
               ).map((courseId: string) => (

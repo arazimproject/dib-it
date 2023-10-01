@@ -8,7 +8,7 @@ import { downloadFile, uploadJson } from "../utilities"
 import CourseCard from "./CourseCard"
 import GoogleSaveButtons from "./GoogleSaveButtons"
 import plansRaw from "./plans.json"
-const plans: Record<string, Record<string, string[]>> = plansRaw
+const plans: Record<string, Record<string, Record<string, string[]>>> = plansRaw
 
 interface Props {
   semester: string
@@ -23,6 +23,11 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
     defaultValue: [],
   })
 
+  const [school] = useLocalStorage<string>({
+    key: "School",
+    serialize: true,
+    defaultValue: "",
+  })
   const [studyPlan] = useLocalStorage<string>({
     key: "Study Plan",
     serialize: true,
@@ -38,10 +43,14 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
   }
 
   const possiblyFilterPlanOnly = (courses: string[]) => {
-    if (showOnlyStudyPlan && plans[studyPlan] !== undefined) {
+    if (
+      showOnlyStudyPlan &&
+      plans[school] !== undefined &&
+      plans[school][studyPlan] !== undefined
+    ) {
       const courseSet = new Set()
-      for (const part in plans[studyPlan]) {
-        for (const course of plans[studyPlan][part]) {
+      for (const part in plans[school][studyPlan]) {
+        for (const course of plans[school][studyPlan][part]) {
           courseSet.add(course)
         }
       }
@@ -148,6 +157,8 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         ).map((id) => `${courseInfo[id]?.name} (${id})`)}
         icon={<i className="fa-solid fa-search" />}
         placeholder="חיפוש"
+        limit={20}
+        maxDropdownHeight={300}
       />
 
       {courses.map((courseId, index) => (
