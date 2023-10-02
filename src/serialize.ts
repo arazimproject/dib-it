@@ -43,7 +43,7 @@ export const getICS = (
   semester: string,
   courses: string[],
   courseInfo: Record<string, Course | undefined>
-) => {
+): Promise<string> => {
   const chosenGroups: Record<string, string[]> = getLocalStorage("Groups", {})
 
   return new Promise((resolve, reject) => {

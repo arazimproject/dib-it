@@ -37,7 +37,10 @@ const Header = () => {
       >
         ארזים | Dib It
       </h3>
-      <a href="https://github.com/arazimproject/dib-it" className="link">
+      <a
+        href="https://github.com/arazimproject/dib-it"
+        className="link show-wide"
+      >
         <i
           className="fa-brands fa-github"
           style={{ marginInlineStart: 10, fontSize: 24, color: "white" }}

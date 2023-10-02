@@ -161,9 +161,17 @@ body,
   .footer > p {
     font-size: 9pt;
   }
+}
 
+@media (max-height: 500px) {
+  .footer > p {
+    font-size: 9pt;
+  }
+}
+
+@media (max-width: 500px) {
   .show-wide {
-    display: none;
+    display: none !important;
   }
 }
 

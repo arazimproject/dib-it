@@ -1,4 +1,5 @@
 import { Autocomplete, Button, Select } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
 import { useState } from "react"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage } from "../hooks"
@@ -122,8 +123,23 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
           const ics = await getICS(semester, courses, courseInfo)
           downloadFile(
             "calendar.ics",
-            "data:text/calendar;charset=utf-8," + ics
+            "data:text/calendar;charset=utf-8," + encodeURIComponent(ics)
           )
+          notifications.show({
+            title: "הייצוא הושלם בהצלחה",
+            message:
+              "כעת עליכם לבצע ייבוא לקובץ ה-ICS שהורד. לחצו כאן כדי לפתוח את חלון הייבוא של Google Calendar.",
+            style: { direction: "rtl" },
+            icon: <i className="fa-solid fa-check" />,
+            color: "green",
+            styles: { body: { cursor: "pointer" } },
+            onClick: () => {
+              window.open(
+                "https://calendar.google.com/calendar/u/0/r/settings/export",
+                "_blank"
+              )
+            },
+          })
         }}
       >
         ייצוא ל-Apple/Google Calendar
