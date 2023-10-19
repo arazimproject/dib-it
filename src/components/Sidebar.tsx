@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Select, Tooltip } from "@mantine/core"
+import { Autocomplete, Button, Select, Switch, Tooltip } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useState } from "react"
 import { useCourseInfo } from "../CourseInfoContext"
@@ -19,6 +19,10 @@ interface Props {
 const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
   const courseInfo = useCourseInfo()
   const [search, setSearch] = useState("")
+  const [compactView, setCompactView] = useLocalStorage<boolean>({
+    key: "Sidebar Compact",
+    defaultValue: false,
+  })
   let [courses, setCourses] = useLocalStorage<string[]>({
     key: "Courses",
     defaultValue: [],
@@ -177,6 +181,13 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         maxDropdownHeight={300}
       />
 
+      <Switch
+        mb="xs"
+        label={compactView ? "תצוגה קומפקטית" : "תצוגה מלאה"}
+        checked={compactView}
+        onChange={(e) => setCompactView(e.currentTarget.checked)}
+      />
+
       {courses.map((courseId, index) => (
         <CourseCard
           key={index}
@@ -185,6 +196,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
           courses={courses}
           setCourses={setCourses}
           semester={semester}
+          compactView={compactView}
         />
       ))}
     </div>

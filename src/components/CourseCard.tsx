@@ -10,6 +10,7 @@ interface Props {
   courses: string[]
   setCourses: React.Dispatch<React.SetStateAction<string[]>>
   semester: string
+  compactView: boolean
 }
 
 const CourseCard: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const CourseCard: React.FC<Props> = ({
   courses,
   setCourses,
   semester,
+  compactView,
 }) => {
   const courseColor = getColor(courseId)
   const courseIdWithDash =
@@ -129,84 +131,88 @@ const CourseCard: React.FC<Props> = ({
           {group.group} ({group.lessons[0].ofen_horaa}): {group.lecturer}
         </div>
       ))}
-      <ColorInput
-        dir="ltr"
-        size="md"
-        label="בחירת צבע"
-        value={courseColor}
-        styles={{
-          input: { textAlign: "right" },
-          label: { color: "inherit" },
-        }}
-        onChange={(color) => {
-          setCustomColors({ ...customColors, [courseId]: color })
-        }}
-      />
-      <Button.Group mt="xs">
-        <Button
-          size="xs"
-          variant="default"
-          fullWidth
-          leftIcon={<i className="fa-solid fa-chart-column" />}
-          onClick={() =>
-            window.open(
-              `https://www.tau-factor.com/?course=${courseIdWithDash}`,
-              "_blank"
-            )
-          }
-        >
-          ציוני עבר
-        </Button>
-        <Button
-          size="xs"
-          variant="default"
-          fullWidth
-          leftIcon={<i className="fa-solid fa-line-chart" />}
-          type="submit"
-          form={"bidding-stats-" + courseId}
-        >
-          בידינג
-        </Button>
-        <Button
-          size="xs"
-          variant="default"
-          fullWidth
-          leftIcon={<i className="fa-solid fa-search" />}
-          type="submit"
-          form={"ims-search-" + courseId}
-        >
-          תוצאות חיפוש
-        </Button>
-      </Button.Group>
+      {compactView || (
+        <>
+          <ColorInput
+            dir="ltr"
+            size="md"
+            label="בחירת צבע"
+            value={courseColor}
+            styles={{
+              input: { textAlign: "right" },
+              label: { color: "inherit" },
+            }}
+            onChange={(color) => {
+              setCustomColors({ ...customColors, [courseId]: color })
+            }}
+          />
+          <Button.Group mt="xs">
+            <Button
+              size="xs"
+              variant="default"
+              fullWidth
+              leftIcon={<i className="fa-solid fa-chart-column" />}
+              onClick={() =>
+                window.open(
+                  `https://www.tau-factor.com/?course=${courseIdWithDash}`,
+                  "_blank"
+                )
+              }
+            >
+              ציוני עבר
+            </Button>
+            <Button
+              size="xs"
+              variant="default"
+              fullWidth
+              leftIcon={<i className="fa-solid fa-line-chart" />}
+              type="submit"
+              form={"bidding-stats-" + courseId}
+            >
+              בידינג
+            </Button>
+            <Button
+              size="xs"
+              variant="default"
+              fullWidth
+              leftIcon={<i className="fa-solid fa-search" />}
+              type="submit"
+              form={"ims-search-" + courseId}
+            >
+              תוצאות חיפוש
+            </Button>
+          </Button.Group>
 
-      <form
-        action="https://www.ims.tau.ac.il/tal/kr/Search_L.aspx"
-        method="POST"
-        id={"ims-search-" + courseId}
-        target="_blank"
-      >
-        <input type="hidden" name="txtKurs" value={courseId} />
-        <input
-          type="hidden"
-          name="lstYear"
-          value={semesterInfo[semester].imsYear}
-        />
-      </form>
-      <form
-        action="https://www.ims.tau.ac.il/Bidd/Stats/Stats_L.aspx"
-        method="POST"
-        id={"bidding-stats-" + courseId}
-        target="_blank"
-      >
-        <input type="hidden" name="lstFacBidd" value="0300" />
-        <input type="hidden" name="lstShana" value="" />
-        <input
-          type="hidden"
-          name="sem"
-          value={semesterInfo[semester].semesterNumber}
-        />
-        <input type="hidden" name="txtKurs" value={courseId} />
-      </form>
+          <form
+            action="https://www.ims.tau.ac.il/tal/kr/Search_L.aspx"
+            method="POST"
+            id={"ims-search-" + courseId}
+            target="_blank"
+          >
+            <input type="hidden" name="txtKurs" value={courseId} />
+            <input
+              type="hidden"
+              name="lstYear"
+              value={semesterInfo[semester].imsYear}
+            />
+          </form>
+          <form
+            action="https://www.ims.tau.ac.il/Bidd/Stats/Stats_L.aspx"
+            method="POST"
+            id={"bidding-stats-" + courseId}
+            target="_blank"
+          >
+            <input type="hidden" name="lstFacBidd" value="0300" />
+            <input type="hidden" name="lstShana" value="" />
+            <input
+              type="hidden"
+              name="sem"
+              value={semesterInfo[semester].semesterNumber}
+            />
+            <input type="hidden" name="txtKurs" value={courseId} />
+          </form>
+        </>
+      )}
     </div>
   )
 }
