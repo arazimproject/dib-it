@@ -20,7 +20,6 @@ const GoogleSaveButtons = () => {
       <Button
         color="green"
         style={{ width: "50%" }}
-        size="md"
         leftIcon={<i className="fa-solid fa-save" />}
         loading={saveLoading}
         onClick={() =>
@@ -54,7 +53,6 @@ const GoogleSaveButtons = () => {
       <Button
         color="green"
         style={{ width: "50%" }}
-        size="md"
         leftIcon={<i className="fa-solid fa-sync" />}
         loading={restoreLoading}
         onClick={() => {

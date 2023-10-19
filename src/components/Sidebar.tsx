@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Select } from "@mantine/core"
+import { Autocomplete, Button, Select, Tooltip } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useState } from "react"
 import { useCourseInfo } from "../CourseInfoContext"
@@ -86,23 +86,23 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
       <GoogleSaveButtons />
 
       <Button.Group mb={10} style={{ width: "100%" }}>
+        <Tooltip label="הורידו קובץ JSON שמכיל את כל המערכות שלכם">
+          <Button
+            style={{ width: "50%" }}
+            leftIcon={<i className="fa-solid fa-download" />}
+            onClick={() =>
+              downloadFile(
+                "dibit.json",
+                "data:text/json;charset=utf-8," +
+                  encodeURIComponent(JSON.stringify(save()))
+              )
+            }
+          >
+            הורדה
+          </Button>
+        </Tooltip>
         <Button
           style={{ width: "50%" }}
-          size="md"
-          leftIcon={<i className="fa-solid fa-download" />}
-          onClick={() =>
-            downloadFile(
-              "dibit.json",
-              "data:text/json;charset=utf-8," +
-                encodeURIComponent(JSON.stringify(save()))
-            )
-          }
-        >
-          הורדה
-        </Button>
-        <Button
-          style={{ width: "50%" }}
-          size="md"
           leftIcon={<i className="fa-solid fa-upload" />}
           onClick={async () => {
             const state = await uploadJson()
@@ -116,7 +116,6 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
       <Button
         fullWidth
         leftIcon={<i className="fa-solid fa-calendar" />}
-        size="md"
         color="blue"
         style={{ flex: "none" }}
         onClick={async () => {
@@ -169,7 +168,9 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
           courses.includes !== undefined
             ? Object.keys(courseInfo).filter((id) => !courses.includes(id))
             : Object.keys(courseInfo)
-        ).map((id) => `${courseInfo[id]?.name} (${id})`)}
+        )
+          .map((id) => `${courseInfo[id]?.name} (${id})`)
+          .sort()}
         icon={<i className="fa-solid fa-search" />}
         placeholder="חיפוש"
         limit={20}

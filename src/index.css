@@ -107,7 +107,7 @@ body,
   }
 
   #sidebar {
-    width: 325px;
+    width: 335px;
   }
 }
 
@@ -205,4 +205,35 @@ body,
 
 .card:hover {
   transform: scale(1.015);
+}
+
+#schedule-container *::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background-color: #ddd;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #333;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #444;
+  }
 }

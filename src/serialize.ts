@@ -84,6 +84,10 @@ export const getICS = (
         }
 
         for (const lesson of group.lessons) {
+          if (lesson.time === "") {
+            continue
+          }
+
           const [startHourStr, endHourStr] = lesson.time.split("-")
           const startHour = parseInt(startHourStr.split(":")[0], 10)
           const endHour = parseInt(endHourStr.split(":")[0], 10)
