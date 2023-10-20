@@ -40,6 +40,10 @@ const StudyPlan = () => {
       key: "Show Only Plan Courses",
       defaultValue: false,
     })
+  const [hideTakenCourses, setHideTakenCourses] = useLocalStorage<boolean>({
+    key: "Hiden Taken Courses",
+    defaultValue: false,
+  })
 
   const courseInfo = useCourseInfo()
 
@@ -62,15 +66,15 @@ const StudyPlan = () => {
 
   const getSortingValue = (courseId: string) => {
     if (takenCourses[courseId]) {
-      return 1000
+      return 100000000000
     }
     if (courses.includes(courseId)) {
-      return 999
+      return 99999999999
     }
 
     const date = courseInfo[courseId]!.exam_dates
     if (date.length === 0) {
-      return -1000
+      return -100000000000
     }
 
     if (courseDates.length === 0) {
@@ -85,6 +89,14 @@ const StudyPlan = () => {
   const possiblySort = (a: string[]) => {
     if (sorted) {
       a.sort((x, y) => getSortingValue(x) - getSortingValue(y))
+    }
+
+    return a
+  }
+
+  const possibleFilterTakenCourses = (a: string[]) => {
+    if (hideTakenCourses) {
+      return a.filter((courseId) => !takenCourses[courseId])
     }
 
     return a
@@ -140,11 +152,27 @@ const StudyPlan = () => {
         checked={showOnlyPlanCourses}
         onChange={(e) => setShowOnlyPlanCourses(e.currentTarget.checked)}
       />
+      <Switch
+        mt="xs"
+        label="הסתר קורסים שנלקחו"
+        checked={hideTakenCourses}
+        onChange={(e) => setHideTakenCourses(e.currentTarget.checked)}
+      />
 
       {plans[school] !== undefined &&
         plans[school][studyPlan] !== undefined &&
         Object.keys(plans[school][studyPlan]).map((key) => {
           const textColor = hash.hsl(key)[2] > 0.5 ? "black" : "white"
+
+          const categoryCourses = possibleFilterTakenCourses(
+            plans[school][studyPlan][key].filter(
+              (courseId: string) => courseInfo[courseId] !== undefined
+            )
+          )
+
+          if (categoryCourses.length === 0) {
+            return <></>
+          }
 
           return (
             <div
@@ -163,11 +191,7 @@ const StudyPlan = () => {
               }}
             >
               <h2 style={{ marginBottom: 10 }}>{key}</h2>
-              {possiblySort(
-                plans[school][studyPlan][key].filter(
-                  (courseId: string) => courseInfo[courseId] !== undefined
-                )
-              ).map((courseId: string) => (
+              {possiblySort(categoryCourses).map((courseId: string) => (
                 <Checkbox
                   // Convert to boolean to make sure the component doesn't change
                   // from uncontrolled to controlled if this is undefined
@@ -197,7 +221,7 @@ const StudyPlan = () => {
                           <Badge
                             ml={5}
                             variant="filled"
-                            color="dark"
+                            color="green"
                             leftSection={<i className="fa-solid fa-check" />}
                           >
                             אין מבחן
@@ -208,7 +232,7 @@ const StudyPlan = () => {
                         <Badge
                           ml={5}
                           variant="filled"
-                          color="green"
+                          color="dark"
                           leftSection={<i className="fa-solid fa-check" />}
                         >
                           נמצא במערכת

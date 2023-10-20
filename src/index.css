@@ -48,7 +48,7 @@ body,
   margin-right: 1px !important;
 }
 
-#schedule-container.wide > div > div > div > div:has(> div) {
+#schedule-container > div > div > div > div:has(> div) {
   overflow: auto !important;
 }
 
