@@ -128,7 +128,7 @@ const CourseCard: React.FC<Props> = ({
               setChosenGroups({ ...chosenGroups })
             }}
           />
-          {group.group} ({group.lessons[0].ofen_horaa}): {group.lecturer}
+          {group.group} ({group.lessons[0].type}): {group.lecturer}
         </div>
       ))}
       {compactView || (

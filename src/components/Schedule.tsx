@@ -1,5 +1,9 @@
 import { Switch } from "@mantine/core"
-import { DaySchedule, ScheduleView, createTheme } from "react-schedule-view"
+import {
+  DaySchedule,
+  ScheduleView,
+  createTheme,
+} from "../thirdparty/react-schedule-view"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage } from "../hooks"
 import { getColor } from "../utilities"
@@ -51,6 +55,7 @@ const Schedule = () => {
     { name: "שני", events: [] },
     { name: "ראשון", events: [] },
   ]
+
   for (const course of courses) {
     if (chosenGroups[course] === undefined) {
       continue
@@ -71,7 +76,7 @@ const Schedule = () => {
           data[DAY_INDEX[lesson.day]].events.push({
             startTime: startHour,
             endTime: endHour,
-            title: `${courseInfo[course]?.name} (${lesson.ofen_horaa})`,
+            title: `${courseInfo[course]?.name} (${lesson.type})`,
             description: `${lesson.building}  ${lesson.room} ${
               info.lecturer !== null ? " (" + info.lecturer + ")" : ""
             }`,

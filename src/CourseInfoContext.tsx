@@ -6,7 +6,7 @@ export interface Course {
   name: string
   faculty: string
 
-  exam_dates: {
+  exams: {
     date: string
     hour: string
     moed: string
@@ -18,7 +18,7 @@ export interface Course {
     lessons: {
       building: string
       day: string
-      ofen_horaa: string
+      type: string
       room: string
       semester: string
       time: string

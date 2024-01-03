@@ -50,7 +50,7 @@ const StudyPlan = () => {
   let courseDates: number[] = []
   if (sorted) {
     for (const course of courses) {
-      const examDates = courseInfo[course]?.exam_dates
+      const examDates = courseInfo[course]?.exams
       if (examDates?.length !== undefined && examDates.length > 0) {
         for (const date of examDates) {
           const parsedDate = parseDateString(date.date)
@@ -72,7 +72,7 @@ const StudyPlan = () => {
       return 99999999999
     }
 
-    const date = courseInfo[courseId]!.exam_dates
+    const date = courseInfo[courseId]!.exams
     if (date.length === 0) {
       return -100000000000
     }
@@ -108,6 +108,7 @@ const StudyPlan = () => {
         overflow: "auto",
         paddingTop: 10,
         marginBottom: 10,
+        marginLeft: 10,
       }}
     >
       <p style={{ marginTop: 5 }}>
@@ -215,9 +216,8 @@ const StudyPlan = () => {
                       </span>
 
                       {courseInfo[courseId] !== undefined &&
-                        courseInfo[courseId]!.exam_dates.filter(
-                          (x) => x.date !== ""
-                        ).length === 0 && (
+                        courseInfo[courseId]!.exams.filter((x) => x.date !== "")
+                          .length === 0 && (
                           <Badge
                             ml={5}
                             variant="filled"

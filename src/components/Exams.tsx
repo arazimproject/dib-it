@@ -44,7 +44,7 @@ const Exams = () => {
   > = {}
 
   for (const courseId of courses) {
-    for (const date of courseInfo[courseId]?.exam_dates ?? []) {
+    for (const date of courseInfo[courseId]?.exams ?? []) {
       const parsedDate = parseDateString(date.date)
       if (parsedDate === undefined) {
         continue
@@ -98,8 +98,7 @@ const Exams = () => {
             </span>
           </p>
         ))}
-
-        <h3 style={{ marginTop: 10, marginBottom: 10 }}>הפרשים</h3>
+        <h3 style={{ marginTop: 10, marginBottom: 10 }}>הפרשי ימים</h3>
         <div dir="ltr">
           {examDates.map(({ courseId, date, moed }, index) => (
             <React.Fragment key={index}>
@@ -165,7 +164,18 @@ const Exams = () => {
                     exams.map((e) => courseInfo[e.courseId]?.name).join(", ")
                   }
                 >
-                  <div style={{ color: "red" }}>{day}</div>
+                  <div
+                    style={{
+                      border: "3px solid red",
+                      width: 30,
+                      height: 30,
+                      textAlign: "center",
+                      padding: 2,
+                      borderRadius: 5,
+                    }}
+                  >
+                    {day}
+                  </div>
                 </Tooltip>
               )
             } else {
@@ -177,7 +187,13 @@ const Exams = () => {
                 >
                   <div
                     style={{
-                      color: getColor(exams[0].courseId),
+                      backgroundColor: getColor(exams[0].courseId),
+                      color: "white",
+                      width: 30,
+                      height: 30,
+                      textAlign: "center",
+                      padding: 5,
+                      borderRadius: 5,
                     }}
                   >
                     {day}

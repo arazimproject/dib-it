@@ -14,15 +14,15 @@ const semesterInfo: Record<string, SemesterInfo> = {
     name: "תשפ״ד א׳",
     imsYear: "2023",
     semesterNumber: 1,
-    startDate: new Date("October 15, 2023 00:00:00"),
-    endDate: new Date("January 15, 2024 00:00:00"),
+    startDate: new Date("December 31, 2023 00:00:00"),
+    endDate: new Date("March 15, 2024 00:00:00"),
   },
   "2024b": {
     name: "תשפ״ד ב׳",
     imsYear: "2023",
     semesterNumber: 2,
-    startDate: new Date("March 4, 2024 00:00:00"),
-    endDate: new Date("June 23, 2024 00:00:00"),
+    startDate: new Date("May 26, 2024 00:00:00"),
+    endDate: new Date("August 12, 2024 00:00:00"),
   },
 }
 

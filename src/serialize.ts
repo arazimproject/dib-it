@@ -4,6 +4,8 @@ import { getLocalStorage, setLocalStorage } from "./hooks"
 import semesterInfo from "./semesterInfo"
 import { parseDateString } from "./utilities"
 
+const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
+
 /**
  * Restore the application state from the given JSON.
  * The JSON should be generated using the {@link save} method.
@@ -56,7 +58,7 @@ export const getICS = (
         continue
       }
 
-      for (const exam of course.exam_dates) {
+      for (const exam of course.exams) {
         const date = parseDateString(exam.date)
         if (date === undefined) {
           continue
@@ -92,15 +94,17 @@ export const getICS = (
           const startHour = parseInt(startHourStr.split(":")[0], 10)
           const endHour = parseInt(endHourStr.split(":")[0], 10)
 
+          const startDate = new Date(info.startDate.getTime() + DAYS.indexOf(lesson.day) * MILLISECONDS_IN_DAY)
+
           events.push({
-            title: `${course.name} (${lesson.ofen_horaa})`,
+            title: `${course.name} (${lesson.type})`,
             description:
               "מרצה: " + group.lecturer + "\nמספר קורס:" + courseName,
-            location: `${lesson.building}  ${lesson.room}`,
+            location: `${lesson.building} ${lesson.room}`,
             start: [
-              info.startDate.getFullYear(),
-              info.startDate.getMonth() + 1,
-              info.startDate.getDate() + DAYS.indexOf(lesson.day),
+              startDate.getFullYear(),
+              startDate.getMonth() + 1,
+              startDate.getDate(),
               startHour,
               0,
             ],
