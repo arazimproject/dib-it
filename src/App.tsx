@@ -86,7 +86,7 @@ const App = () => {
       const localStorageKey = "Cached Courses for " + semester
       setCourses(getLocalStorage(localStorageKey))
       fetch(
-        `/courses/${semester}.json?date=${encodeURIComponent(
+        `https://arazim-project.com/courses/${semester}.json?date=${encodeURIComponent(
           new Date().toDateString()
         )}`
       )
@@ -107,6 +107,8 @@ const App = () => {
       theme={{
         colorScheme,
         primaryColor: "cyan",
+        fontFamily:
+          'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
       }}
       emotionCache={rtlCache}
     >

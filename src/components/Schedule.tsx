@@ -1,9 +1,6 @@
 import { Switch } from "@mantine/core"
-import {
-  DaySchedule,
-  ScheduleView,
-  createTheme,
-} from "../thirdparty/react-schedule-view"
+import { useColorScheme } from "@mantine/hooks"
+import { DaySchedule, ScheduleView, createTheme } from "react-schedule-view/src"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage } from "../hooks"
 import { getColor } from "../utilities"
@@ -11,6 +8,7 @@ import { getColor } from "../utilities"
 const wideScheduleTheme = createTheme("apple", {
   hourHeight: "85px",
   minorGridlinesPerHour: 1,
+  timeFormatter: (hour: number) => hour.toString() + ":00",
 })
 
 const compactScheduleTheme = createTheme("apple", {
@@ -41,6 +39,7 @@ const Schedule = () => {
     key: "Groups",
     defaultValue: {},
   })
+  const colorScheme = useColorScheme()
 
   useLocalStorage<Record<string, string>>({
     key: "Colors",
@@ -110,6 +109,7 @@ const Schedule = () => {
         style={{ minWidth: compactView ? undefined : 600, maxWidth: "100%" }}
       >
         <ScheduleView
+          darkMode={colorScheme === "dark"}
           theme={compactView ? compactScheduleTheme : wideScheduleTheme}
           daySchedules={data}
           viewStartTime={8}
