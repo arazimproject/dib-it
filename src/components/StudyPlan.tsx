@@ -118,7 +118,7 @@ const StudyPlan = () => {
       <Select
         mt="xs"
         label="פקולטה"
-        icon={<i className="fa-solid fa-school" />}
+        leftSection={<i className="fa-solid fa-school" />}
         data={Object.keys(plans).sort()}
         value={school}
         onChange={(e) => {
@@ -132,7 +132,7 @@ const StudyPlan = () => {
           mt="xs"
           size="md"
           label="תוכנית לימוד"
-          icon={<i className="fa-solid fa-book" />}
+          leftSection={<i className="fa-solid fa-book" />}
           data={Object.keys(plans[school]).sort()}
           value={studyPlan}
           onChange={setStudyPlan}
@@ -243,7 +243,7 @@ const StudyPlan = () => {
                         <Button
                           variant="default"
                           style={{ marginInlineStart: 5 }}
-                          leftIcon={<i className="fa-solid fa-plus" />}
+                          leftSection={<i className="fa-solid fa-plus" />}
                           size="xs"
                           onClick={(e) => {
                             e.preventDefault()

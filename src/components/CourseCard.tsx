@@ -109,7 +109,7 @@ const CourseCard: React.FC<Props> = ({
         >
           <Checkbox
             styles={{ input: { cursor: "pointer" } }}
-            mr={10}
+            ml={10}
             checked={
               chosenGroups[courseId] !== undefined &&
               chosenGroups[courseId].includes !== undefined &&
@@ -151,7 +151,7 @@ const CourseCard: React.FC<Props> = ({
               size="xs"
               variant="default"
               fullWidth
-              leftIcon={<i className="fa-solid fa-chart-column" />}
+              leftSection={<i className="fa-solid fa-chart-column" />}
               onClick={() =>
                 window.open(
                   `https://www.tau-factor.com/?course=${courseIdWithDash}`,
@@ -165,7 +165,7 @@ const CourseCard: React.FC<Props> = ({
               size="xs"
               variant="default"
               fullWidth
-              leftIcon={<i className="fa-solid fa-line-chart" />}
+              leftSection={<i className="fa-solid fa-line-chart" />}
               type="submit"
               form={"bidding-stats-" + courseId}
             >
@@ -175,7 +175,7 @@ const CourseCard: React.FC<Props> = ({
               size="xs"
               variant="default"
               fullWidth
-              leftIcon={<i className="fa-solid fa-search" />}
+              leftSection={<i className="fa-solid fa-search" />}
               type="submit"
               form={"ims-search-" + courseId}
             >
@@ -188,7 +188,7 @@ const CourseCard: React.FC<Props> = ({
             size="xs"
             variant="default"
             mt="xs"
-            leftIcon={<i className="fa-solid fa-file-lines" />}
+            leftSection={<i className="fa-solid fa-file-lines" />}
             component="a"
             href={`https://arazim-project.com/tau-search/?courseNumber=${courseId}&year=&showOnlyWithExams=true`}
             target="_blank"

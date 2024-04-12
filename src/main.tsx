@@ -4,8 +4,12 @@ import { useColorScheme } from "@mantine/hooks"
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { ErrorBoundary, FallbackProps } from "react-error-boundary"
-import App, { rtlCache } from "./App.tsx"
+import App from "./App.tsx"
 import "./index.css"
+
+import "@mantine/core/styles.css"
+import "@mantine/notifications/styles.css"
+import "@mantine/dates/styles.css"
 
 const ErrorFallback: React.FC<FallbackProps> = () => {
   const colorScheme = useColorScheme()
@@ -20,14 +24,10 @@ const ErrorFallback: React.FC<FallbackProps> = () => {
 
   return (
     <MantineProvider
-      withGlobalStyles
-      withCSSVariables
-      withNormalizeCSS
+      forceColorScheme={colorScheme}
       theme={{
-        colorScheme,
         primaryColor: "cyan",
       }}
-      emotionCache={rtlCache}
     >
       <div
         style={{
@@ -48,7 +48,7 @@ const ErrorFallback: React.FC<FallbackProps> = () => {
         <Button
           my={10}
           color="red"
-          leftIcon={<i className="fa-solid fa-wrench" />}
+          leftSection={<i className="fa-solid fa-wrench" />}
           onClick={() => {
             localStorage.clear()
             window.location.reload()

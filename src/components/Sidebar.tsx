@@ -84,7 +84,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
           .sort()
           .map((key) => ({ value: key, label: semesterInfo[key].name }))}
         label="סמסטר"
-        icon={<i className="fa-solid fa-cloud-moon" />}
+        leftSection={<i className="fa-solid fa-cloud-moon" />}
       />
 
       <GoogleSaveButtons />
@@ -93,7 +93,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         <Tooltip label="הורידו קובץ JSON שמכיל את כל המערכות שלכם">
           <Button
             style={{ width: "50%" }}
-            leftIcon={<i className="fa-solid fa-download" />}
+            leftSection={<i className="fa-solid fa-download" />}
             onClick={() =>
               downloadFile(
                 "dibit.json",
@@ -107,7 +107,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         </Tooltip>
         <Button
           style={{ width: "50%" }}
-          leftIcon={<i className="fa-solid fa-upload" />}
+          leftSection={<i className="fa-solid fa-upload" />}
           onClick={async () => {
             const state = await uploadJson()
             restore(state)
@@ -119,7 +119,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
 
       <Button
         fullWidth
-        leftIcon={<i className="fa-solid fa-calendar" />}
+        leftSection={<i className="fa-solid fa-calendar" />}
         color="blue"
         style={{ flex: "none" }}
         onClick={async () => {
@@ -175,7 +175,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         )
           .map((id) => `${courseInfo[id]?.name} (${id})`)
           .sort()}
-        icon={<i className="fa-solid fa-search" />}
+        leftSection={<i className="fa-solid fa-search" />}
         placeholder="חיפוש"
         limit={20}
         maxDropdownHeight={300}

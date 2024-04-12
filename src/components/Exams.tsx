@@ -6,6 +6,21 @@ import { useLocalStorage } from "../hooks"
 import { MILLISECONDS_IN_DAY, getColor, parseDateString } from "../utilities"
 
 const DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]
+const DAY_LETTERS = ["א", "ב", "ג", "ד", "ה", "ו", "ש"]
+const MONTHS = [
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+]
 
 const stringifyDate = (d: Date) => {
   return d.getDate() + "/" + (d.getMonth() + 1)
@@ -127,13 +142,9 @@ const Exams = () => {
                 <span
                   style={{
                     marginRight:
-                      moed === "א" && examDates[index + 1]?.moed === "ב"
-                        ? 10
-                        : undefined,
+                      moed !== examDates[index + 1]?.moed ? 10 : undefined,
                     marginLeft:
-                      moed === "א" && examDates[index + 1]?.moed === "ב"
-                        ? 10
-                        : undefined,
+                      moed !== examDates[index + 1]?.moed ? 10 : undefined,
                   }}
                 >
                   →
@@ -144,7 +155,6 @@ const Exams = () => {
         </div>
       </div>
       <Calendar
-        dir="ltr"
         firstDayOfWeek={0}
         weekendDays={[]}
         static
@@ -152,6 +162,8 @@ const Exams = () => {
         defaultDate={firstExam}
         minDate={firstExam}
         maxDate={lastExam}
+        monthLabelFormat={(m) => `${MONTHS[m.getMonth()]} ${m.getFullYear()}`}
+        weekdayFormat={(d) => DAY_LETTERS[d.getDay()] + "'"}
         renderDay={(date) => {
           const day = date.getDate()
           const exams = dateToExams[date.toDateString()]
@@ -205,9 +217,6 @@ const Exams = () => {
 
           return <div>{day}</div>
         }}
-        onPointerEnterCapture={undefined}
-        onPointerLeaveCapture={undefined}
-        placeholder={undefined}
       />
     </div>
   )

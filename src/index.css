@@ -84,19 +84,7 @@ body,
   }
 
   #sidebar {
-    width: 335px;
-  }
-}
-
-@media only screen and (min-width: 1200px) {
-  #sidebar {
-    width: 350px;
-  }
-}
-
-@media only screen and (min-width: 1400px) {
-  #sidebar {
-    width: 400px;
+    width: 420px;
   }
 }
 
@@ -112,6 +100,10 @@ body,
 
   .dont-print {
     display: none !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    display: none;
   }
 }
 

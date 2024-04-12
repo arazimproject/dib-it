@@ -20,7 +20,7 @@ const GoogleSaveButtons = () => {
       <Button
         color="green"
         style={{ width: "50%" }}
-        leftIcon={<i className="fa-solid fa-save" />}
+        leftSection={<i className="fa-solid fa-save" />}
         loading={saveLoading}
         onClick={() =>
           setDoc(doc(firestore, `/users/${currentUser.uid}`), save(), {
@@ -53,7 +53,7 @@ const GoogleSaveButtons = () => {
       <Button
         color="green"
         style={{ width: "50%" }}
-        leftIcon={<i className="fa-solid fa-sync" />}
+        leftSection={<i className="fa-solid fa-sync" />}
         loading={restoreLoading}
         onClick={() => {
           setRestoreLoading(true)

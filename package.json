@@ -11,12 +11,11 @@
     "deploy": "yarn build && firebase deploy"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.1",
     "@fortawesome/fontawesome-free": "^6.4.0",
-    "@mantine/core": "^6.0.17",
-    "@mantine/dates": "^6.0.17",
-    "@mantine/hooks": "^6.0.17",
-    "@mantine/notifications": "^6.0.20",
+    "@mantine/core": "^7.8.0",
+    "@mantine/dates": "^7.8.0",
+    "@mantine/hooks": "^7.8.0",
+    "@mantine/notifications": "^7.8.0",
     "@types/color-hash": "^1.0.2",
     "color-hash": "^2.0.2",
     "dayjs": "^1.11.9",

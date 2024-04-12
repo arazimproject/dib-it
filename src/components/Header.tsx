@@ -26,7 +26,7 @@ const Header = () => {
       <a href="/">
         <img
           className="logo"
-          src="/logo.png"
+          src="https://arazim-project.com/logo.png"
           height={40}
           style={{ marginLeft: 10, marginRight: 20 }}
         />
@@ -51,7 +51,7 @@ const Header = () => {
         <Button
           mx="xs"
           variant="white"
-          leftIcon={<i className="fa-solid fa-sign-in" />}
+          leftSection={<i className="fa-solid fa-sign-in" />}
           onClick={() => signInWithPopup(auth, google)}
         >
           התחבר
@@ -73,7 +73,7 @@ const Header = () => {
           <Button
             mx="xs"
             variant="white"
-            leftIcon={<i className="fa-solid fa-sign-out" />}
+            leftSection={<i className="fa-solid fa-sign-out" />}
             onClick={() => signOut(auth)}
           >
             התנתק

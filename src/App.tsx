@@ -1,13 +1,7 @@
-import {
-  Button,
-  Loader,
-  MantineProvider,
-  createEmotionCache,
-} from "@mantine/core"
+import { Button, Loader, MantineProvider } from "@mantine/core"
 import { useColorScheme } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useEffect, useState } from "react"
-import rtlPlugin from "stylis-plugin-rtl"
 import CourseContext, { Course } from "./CourseInfoContext"
 import Exams from "./components/Exams"
 import Footer from "./components/Footer"
@@ -17,11 +11,6 @@ import Sidebar from "./components/Sidebar"
 import StudyPlan from "./components/StudyPlan"
 import { getLocalStorage, setLocalStorage, useLocalStorage } from "./hooks"
 import { currentSemester } from "./semesterInfo"
-
-export const rtlCache = createEmotionCache({
-  key: "mantine-rtl",
-  stylisPlugins: [rtlPlugin],
-})
 
 const switchSemesterLocalStorage = (
   oldSemester: string,
@@ -101,16 +90,12 @@ const App = () => {
 
   return (
     <MantineProvider
-      withGlobalStyles
-      withCSSVariables
-      withNormalizeCSS
+      forceColorScheme={colorScheme}
       theme={{
-        colorScheme,
         primaryColor: "cyan",
         fontFamily:
           'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
       }}
-      emotionCache={rtlCache}
     >
       <Notifications />
 
@@ -132,7 +117,7 @@ const App = () => {
                 flexGrow: 1,
                 overflowY: "auto",
                 display: "flex",
-                width: "95%",
+                width: "calc(100% - 20px)",
               }}
             >
               <Sidebar
@@ -158,7 +143,7 @@ const App = () => {
                       className="dont-print"
                       size="md"
                       variant={tab === "schedule" ? "light" : "subtle"}
-                      leftIcon={<i className="fa-solid fa-calendar" />}
+                      leftSection={<i className="fa-solid fa-calendar" />}
                       onClick={() => setTab("schedule")}
                     >
                       מערכת
@@ -167,7 +152,7 @@ const App = () => {
                       className="dont-print"
                       size="md"
                       variant={tab === "exams" ? "light" : "subtle"}
-                      leftIcon={<i className="fa-solid fa-list-check" />}
+                      leftSection={<i className="fa-solid fa-list-check" />}
                       onClick={() => setTab("exams")}
                     >
                       מבחנים
@@ -176,7 +161,7 @@ const App = () => {
                       className="dont-print"
                       size="md"
                       variant={tab === "study-plan" ? "light" : "subtle"}
-                      leftIcon={<i className="fa-solid fa-table-list" />}
+                      leftSection={<i className="fa-solid fa-table-list" />}
                       onClick={() => setTab("study-plan")}
                     >
                       תוכנית
