@@ -183,6 +183,19 @@ const CourseCard: React.FC<Props> = ({
             </Button>
           </Button.Group>
 
+          <Button
+            fullWidth
+            size="xs"
+            variant="default"
+            mt="xs"
+            leftIcon={<i className="fa-solid fa-file-lines" />}
+            component="a"
+            href={`https://arazim-project.com/tau-search/?courseNumber=${courseId}&year=&showOnlyWithExams=true`}
+            target="_blank"
+          >
+            מבחני עבר (קישורים ל-Moodle)
+          </Button>
+
           <form
             action="https://www.ims.tau.ac.il/tal/kr/Search_L.aspx"
             method="POST"

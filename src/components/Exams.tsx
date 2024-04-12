@@ -205,6 +205,9 @@ const Exams = () => {
 
           return <div>{day}</div>
         }}
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        placeholder={undefined}
       />
     </div>
   )
