@@ -94,7 +94,10 @@ export const getICS = (
           const startHour = parseInt(startHourStr.split(":")[0], 10)
           const endHour = parseInt(endHourStr.split(":")[0], 10)
 
-          const startDate = new Date(info.startDate.getTime() + DAYS.indexOf(lesson.day) * MILLISECONDS_IN_DAY)
+          const startDate = new Date(
+            info.startDate.getTime() +
+              DAYS.indexOf(lesson.day) * MILLISECONDS_IN_DAY
+          )
 
           events.push({
             title: `${course.name} (${lesson.type})`,
@@ -117,6 +120,10 @@ export const getICS = (
                 .replaceAll(":", "")
                 .replaceAll(".", "")
                 .replace("00Z", "Z"),
+            startInputType: "local",
+            endInputType: "local",
+            startOutputType: "local",
+            endOutputType: "local",
           })
         }
       }

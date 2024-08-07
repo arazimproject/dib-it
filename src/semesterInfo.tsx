@@ -24,8 +24,22 @@ const semesterInfo: Record<string, SemesterInfo> = {
     startDate: new Date("May 26, 2024 00:00:00"),
     endDate: new Date("August 12, 2024 00:00:00"),
   },
+  "2025a": {
+    name: "תשפ״ה א׳",
+    imsYear: "2023",
+    semesterNumber: 1,
+    startDate: new Date("November 3, 2024 00:00:00"),
+    endDate: new Date("February 2, 2025 00:00:00"),
+  },
+  "2025b": {
+    name: "תשפ״ה ב׳",
+    imsYear: "2023",
+    semesterNumber: 2,
+    startDate: new Date("March 16, 2025 00:00:00"),
+    endDate: new Date("July 2, 2025 00:00:00"),
+  },
 }
 
-export const currentSemester = "2024a"
+export const currentSemester = "2025a"
 
 export default semesterInfo
