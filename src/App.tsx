@@ -75,7 +75,7 @@ const App = () => {
       const localStorageKey = "Cached Courses for " + semester
       setCourses(getLocalStorage(localStorageKey))
       fetch(
-        `https://arazim-project.com/courses/${semester}.json?date=${encodeURIComponent(
+        `https://arazim-project.com/courses/courses-${semester}.json?date=${encodeURIComponent(
           new Date().toDateString()
         )}`
       )
