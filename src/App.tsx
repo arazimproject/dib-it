@@ -30,10 +30,14 @@ const switchSemesterLocalStorage = (
 
 const sumHours = (
   courses: Record<string, Course>,
+  chosenCourses: string[],
   chosenGroups: Record<string, string[]>
 ) => {
   let hours = 0
   for (const course in chosenGroups) {
+    if (!chosenCourses.includes(course)) {
+      continue
+    }
     for (const group of chosenGroups[course]) {
       const info = courses[course]?.groups.find((g) => g.group === group)
 
@@ -58,7 +62,11 @@ const App = () => {
   const colorScheme = useColorScheme()
 
   const [tab, setTab] = useState("schedule")
-  const [courses, setCourses] = useState<Record<string, Course>>({})
+  const [courses, setCourses] = useState<Record<string, Course>>({}) // this is tau-tools scraped jsons from arazim project website
+  const [chosenCourses] = useLocalStorage<string[]>({
+    key: "Courses",
+    defaultValue: [],
+  })
   const [semester, setSemester] = useLocalStorage<string>({
     key: "Semester",
     defaultValue: currentSemester,
@@ -68,7 +76,7 @@ const App = () => {
     defaultValue: {},
   })
 
-  const hours = sumHours(courses, chosenGroups)
+  const hours = sumHours(courses, chosenCourses, chosenGroups)
 
   useEffect(() => {
     if (semester) {
