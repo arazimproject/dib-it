@@ -21,7 +21,6 @@ const CourseCard: React.FC<Props> = ({
   semester,
   compactView,
 }) => {
-  const courseColor = getColor(courseId)
   const courseIdWithDash =
     courseId.substring(0, 4) + "-" + courseId.substring(4)
 
@@ -32,6 +31,7 @@ const CourseCard: React.FC<Props> = ({
     Record<string, string>
   >({ key: "Colors", defaultValue: {} })
   const courseInfo = useCourseInfo()
+  const courseColor = getColor(courseId)
 
   return (
     <div
@@ -133,19 +133,16 @@ const CourseCard: React.FC<Props> = ({
       ))}
       {compactView || (
         <>
-          <ColorInput
-            dir="ltr"
-            size="md"
-            label="בחירת צבע"
-            value={courseColor}
-            styles={{
-              input: { textAlign: "right" },
-              label: { color: "inherit" },
-            }}
-            onChange={(color) => {
-              setCustomColors({ ...customColors, [courseId]: color })
-            }}
-          />
+          <div dir="ltr">
+            <ColorInput
+              mt="xs"
+              size="md"
+              value={courseColor}
+              onChange={(color) => {
+                setCustomColors({ ...customColors, [courseId]: color })
+              }}
+            />
+          </div>
           <Button.Group mt="xs">
             <Button
               size="xs"
