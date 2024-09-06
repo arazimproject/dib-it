@@ -6,6 +6,9 @@ import firebase_admin.firestore
 
 
 def migrate(data: dict):
+    if not any([key.startswith("Courses") for key in data.keys()]):
+        return data
+
     result = {}
 
     if "Semester" in data:
@@ -66,9 +69,9 @@ if __name__ == "__main__":
     users = firestore.collection("users")
     data = {}
     for document in users.get():
-        data[document.reference.path] = document.to_dict()
-    with open("backup.json", "w") as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+        firestore.document(document.reference.path).set(migrate(document.to_dict()))
+    # with open("backup.json", "w") as f:
+    # json.dump(data, f, ensure_ascii=False, indent=4)
 
     # document = firestore.document("users/mhkpK3j4ILawzPCOx5FJrbuwSRI3")
     # print(document.get().to_dict())

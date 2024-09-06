@@ -87,3 +87,19 @@ export const useCachedDocumentData = (
 
   return [data, loading, error, snapshot]
 }
+
+const cachedUrlValues: Record<string, any> = {}
+const fetchUrlValuePromises: Record<string, Promise<any>> = {}
+
+export const cachedFetch = async <T = any>(url: string): Promise<T> => {
+  if (cachedUrlValues[url] !== undefined) {
+    return cachedUrlValues[url]
+  }
+
+  if (fetchUrlValuePromises[url] === undefined) {
+    fetchUrlValuePromises[url] = fetch(url).then((r) => r.json())
+  }
+
+  const result = await fetchUrlValuePromises[url]
+  return result
+}

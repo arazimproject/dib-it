@@ -32,7 +32,11 @@ export const getClosestValue = (value: number, sortedList: number[]) => {
 }
 
 export const getColor = (course: DibItCourse): string => {
-  return course.color ?? hash.hex(course.id)
+  return course.color ?? getDefaultColor(course)
+}
+
+export const getDefaultColor = (course: DibItCourse): string => {
+  return hash.hex(course.id)
 }
 
 export const downloadFile = (filename: string, contents: string) => {

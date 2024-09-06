@@ -2,7 +2,7 @@ import { Button, Checkbox, ColorInput } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useDibIt } from "../models"
 import semesterInfo from "../semesterInfo"
-import { getColor } from "../utilities"
+import { getColor, getDefaultColor } from "../utilities"
 
 export interface CourseCardProps {
   index: number
@@ -121,7 +121,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
               size="md"
               value={courseColor}
               onChange={(color) => {
-                course.color = color
+                course.color = color === "" ? getDefaultColor(course) : color
                 setDibIt({ ...dibIt })
               }}
             />
@@ -162,12 +162,11 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
               תוצאות חיפוש
             </Button>
           </Button.Group>
-
           <Button
             fullWidth
             size="xs"
             variant="default"
-            mt="xs"
+            mt={5}
             leftSection={<i className="fa-solid fa-file-lines" />}
             component="a"
             href={`https://arazim-project.com/tau-search/?courseNumber=${course.id}&year=&showOnlyWithExams=true`}

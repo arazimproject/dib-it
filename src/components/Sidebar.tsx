@@ -1,4 +1,11 @@
-import { Autocomplete, Button, Select, Switch, Tooltip } from "@mantine/core"
+import {
+  Autocomplete,
+  Button,
+  Loader,
+  Select,
+  Switch,
+  Tooltip,
+} from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useState } from "react"
 import { useCourseInfo } from "../CourseInfoContext"
@@ -10,7 +17,7 @@ import { downloadFile, uploadJson } from "../utilities"
 import CourseCard from "./CourseCard"
 import GoogleSaveButtons from "./GoogleSaveButtons"
 
-const Sidebar = () => {
+const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
   const courseInfo = useCourseInfo()
   const [search, setSearch] = useState("")
   const [compactView, setCompactView] = useLocalStorage<boolean>({
@@ -45,6 +52,12 @@ const Sidebar = () => {
         padding: 10,
       }}
     >
+      {prefetching && (
+        <p style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
+          <Loader size="sm" ml="xs" /> טוען מראש את כל הקורסים כדי להאיץ את
+          החיפוש...
+        </p>
+      )}
       <Select
         mb={10}
         value={semester}

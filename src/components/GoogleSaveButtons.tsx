@@ -30,7 +30,8 @@ const GoogleSaveButtons = () => {
         style={{ width: "50%" }}
         leftSection={<i className="fa-solid fa-save" />}
         loading={saveLoading}
-        onClick={() =>
+        onClick={() => {
+          setSaveLoading(true)
           setDoc(doc(firestore, `/users/${currentUser.uid}`), dibIt, {
             merge: true,
           })
@@ -54,7 +55,7 @@ const GoogleSaveButtons = () => {
                 color: "red",
               })
             })
-        }
+        }}
       >
         שמירה בגוגל
       </Button>

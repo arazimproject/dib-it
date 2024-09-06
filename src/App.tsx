@@ -9,7 +9,9 @@ import Header from "./components/Header"
 import Schedule from "./components/Schedule"
 import Sidebar from "./components/Sidebar"
 import StudyPlan from "./components/StudyPlan"
+import { cachedFetch } from "./hooks"
 import { DibIt, useDibIt } from "./models"
+import semesterInfo from "./semesterInfo"
 
 const sumHours = (courses: Record<string, Course>, dibIt: DibIt) => {
   let hours = 0
@@ -34,25 +36,40 @@ const sumHours = (courses: Record<string, Course>, dibIt: DibIt) => {
   return hours
 }
 
+const startDateString = `date=${encodeURIComponent(new Date().toDateString())}`
+
 const App = () => {
   const colorScheme = useColorScheme()
   const [dibIt] = useDibIt()
   const [tab, setTab] = useState("schedule")
   const [courses, setCourses] = useState<Record<string, Course>>({}) // this is tau-tools scraped jsons from arazim project website
+  const [prefetching, setPrefetching] = useState(false)
 
   const hours = sumHours(courses, dibIt)
 
   useEffect(() => {
     if (dibIt.semester) {
       setCourses({})
-      fetch(
-        `https://arazim-project.com/courses/courses-${
-          dibIt.semester
-        }.json?date=${encodeURIComponent(new Date().toDateString())}`
+      cachedFetch(
+        `https://arazim-project.com/courses/courses-${dibIt.semester}.json?${startDateString}`
       )
-        .then((r) => r.json())
-        .then((result) => {
+        .then(async (result) => {
           setCourses(result)
+
+          setPrefetching(true)
+          const prefetches: Promise<any>[] = []
+          for (const semester of Object.keys(semesterInfo).sort()) {
+            prefetches.push(
+              cachedFetch(
+                `https://arazim-project.com/courses/courses-${semester}.json?${startDateString}`
+              )
+            )
+          }
+          try {
+            await Promise.all(prefetches)
+          } finally {
+            setPrefetching(false)
+          }
         })
         .catch(() => {})
     }
@@ -90,7 +107,7 @@ const App = () => {
                 width: "calc(100% - 20px)",
               }}
             >
-              <Sidebar />
+              <Sidebar prefetching={prefetching} />
               <div id="content">
                 <div
                   className="adaptive-flex"
