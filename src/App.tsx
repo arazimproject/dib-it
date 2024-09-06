@@ -80,8 +80,6 @@ const App = () => {
 
   useEffect(() => {
     if (semester) {
-      const localStorageKey = "Cached Courses for " + semester
-      setCourses(getLocalStorage(localStorageKey))
       fetch(
         `https://arazim-project.com/courses/courses-${semester}.json?date=${encodeURIComponent(
           new Date().toDateString()
@@ -90,7 +88,6 @@ const App = () => {
         .then((r) => r.json())
         .then((result) => {
           setCourses(result)
-          setLocalStorage(localStorageKey, result)
         })
         .catch(() => {})
     }

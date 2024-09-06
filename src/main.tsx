@@ -8,8 +8,29 @@ import App from "./App.tsx"
 import "./index.css"
 
 import "@mantine/core/styles.css"
-import "@mantine/notifications/styles.css"
 import "@mantine/dates/styles.css"
+import "@mantine/notifications/styles.css"
+
+const handleDeprecation = () => {
+  // Remove "Cached Courses for {semester}", they weigh too much to be in local storage.
+  const keysToRemove = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (!key) {
+      continue
+    }
+
+    if (key.startsWith("Cached Courses for")) {
+      keysToRemove.push(key)
+    }
+  }
+
+  for (const key of keysToRemove) {
+    localStorage.removeItem(key)
+  }
+}
+
+handleDeprecation()
 
 const ErrorFallback: React.FC<FallbackProps> = () => {
   const colorScheme = useColorScheme()
