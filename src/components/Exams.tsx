@@ -2,7 +2,7 @@ import { Tooltip } from "@mantine/core"
 import { Calendar } from "@mantine/dates"
 import React from "react"
 import { useCourseInfo } from "../CourseInfoContext"
-import { useLocalStorage } from "../hooks"
+import { DibItCourse, useDibIt } from "../models"
 import { MILLISECONDS_IN_DAY, getColor, parseDateString } from "../utilities"
 
 const DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]
@@ -28,22 +28,12 @@ const stringifyDate = (d: Date) => {
 
 const Exams = () => {
   const courseInfo = useCourseInfo()
-  let [courses] = useLocalStorage<string[]>({
-    key: "Courses",
-    defaultValue: [],
-  })
+  const [dibIt] = useDibIt()
 
-  if (courses.length === undefined) {
-    courses = []
-  }
-
-  useLocalStorage<Record<string, string>>({
-    key: "Colors",
-    defaultValue: {},
-  })
+  const currentCourses = (dibIt.courses ?? {})[dibIt.semester ?? ""] ?? []
 
   const examDates: {
-    courseId: string
+    course: DibItCourse
     date: Date
     moed: string
     type: string
@@ -51,21 +41,21 @@ const Exams = () => {
   const dateToExams: Record<
     string,
     {
-      courseId: string
+      course: DibItCourse
       date: Date
       moed: string
       type: string
     }[]
   > = {}
 
-  for (const courseId of courses) {
-    for (const date of courseInfo[courseId]?.exams ?? []) {
+  for (const course of currentCourses) {
+    for (const date of courseInfo[course.id]?.exams ?? []) {
       const parsedDate = parseDateString(date.date)
       if (parsedDate === undefined) {
         continue
       }
       examDates.push({
-        courseId,
+        course,
         date: parsedDate,
         type: date.type,
         moed: date.moed,
@@ -104,24 +94,24 @@ const Exams = () => {
           marginBottom: 20,
         }}
       >
-        {examDates.map(({ courseId, date, moed }) => (
-          <p key={courseId + date + moed}>
+        {examDates.map(({ course, date, moed }) => (
+          <p key={course.id + date + moed}>
             {date.toLocaleString("he").split(",")[0]} ({DAYS[date.getDay()]})
             מועד {moed}' ב-
-            <span style={{ color: getColor(courseId) }}>
-              {courseInfo[courseId]?.name}
+            <span style={{ color: getColor(course) }}>
+              {courseInfo[course.id]?.name}
             </span>
           </p>
         ))}
         <h3 style={{ marginTop: 10, marginBottom: 10 }}>הפרשי ימים</h3>
         <div dir="ltr">
-          {examDates.map(({ courseId, date, moed }, index) => (
+          {examDates.map(({ course, date, moed }, index) => (
             <React.Fragment key={index}>
-              <Tooltip label={courseInfo[courseId]?.name}>
+              <Tooltip label={courseInfo[course.id]?.name}>
                 <div
                   key={index}
                   style={{
-                    backgroundColor: getColor(courseId),
+                    backgroundColor: getColor(course),
                     display: "inline-block",
                     padding: 5,
                     paddingRight: 10,
@@ -173,7 +163,7 @@ const Exams = () => {
                 <Tooltip
                   label={
                     "התנגשות בין " +
-                    exams.map((e) => courseInfo[e.courseId]?.name).join(", ")
+                    exams.map((e) => courseInfo[e.course.id]?.name).join(", ")
                   }
                 >
                   <div
@@ -193,13 +183,13 @@ const Exams = () => {
             } else {
               return (
                 <Tooltip
-                  label={`${courseInfo[exams[0].courseId]?.name} (מועד ${
+                  label={`${courseInfo[exams[0].course.id]?.name} (מועד ${
                     exams[0].moed
                   })`}
                 >
                   <div
                     style={{
-                      backgroundColor: getColor(exams[0].courseId),
+                      backgroundColor: getColor(exams[0].course),
                       color: "white",
                       width: 30,
                       height: 30,

@@ -2,8 +2,10 @@ import { DocumentData, DocumentReference } from "firebase/firestore"
 import { useEffect, useState } from "react"
 import { useDocumentData } from "react-firebase-hooks/firestore"
 
-export const getLocalStorage = (key: string, defaultValue = {}) => {
-  return JSON.parse(localStorage.getItem(key) ?? JSON.stringify(defaultValue))
+export const getLocalStorage = <T = any>(key: string, defaultValue = {}) => {
+  return JSON.parse(
+    localStorage.getItem(key) ?? JSON.stringify(defaultValue)
+  ) as T
 }
 
 export const setLocalStorage = (key: string, value = {}) => {

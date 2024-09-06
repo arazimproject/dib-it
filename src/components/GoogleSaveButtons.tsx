@@ -4,12 +4,20 @@ import { doc, getDoc, setDoc } from "firebase/firestore"
 import { useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, firestore } from "../firebase"
-import { restore, save } from "../serialize"
+import { setLocalStorage } from "../hooks"
+import { useDibIt } from "../models"
+
+export const restore = (json: any) => {
+  for (const key in json) {
+    setLocalStorage(key, json[key])
+  }
+}
 
 const GoogleSaveButtons = () => {
   const [currentUser] = useAuthState(auth)
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
+  const [dibIt, setDibIt] = useDibIt()
 
   if (!currentUser) {
     return <></>
@@ -23,7 +31,7 @@ const GoogleSaveButtons = () => {
         leftSection={<i className="fa-solid fa-save" />}
         loading={saveLoading}
         onClick={() =>
-          setDoc(doc(firestore, `/users/${currentUser.uid}`), save(), {
+          setDoc(doc(firestore, `/users/${currentUser.uid}`), dibIt, {
             merge: true,
           })
             .then(() => {
@@ -59,7 +67,13 @@ const GoogleSaveButtons = () => {
           setRestoreLoading(true)
           getDoc(doc(firestore, `/users/${currentUser.uid}`))
             .then((d) => {
-              restore(d.data())
+              const data = d.data()
+
+              if (data) {
+                restore(data)
+                setDibIt(data)
+              }
+
               notifications.show({
                 title: "העדכון מגוגל בוצע בהצלחה",
                 message: "המערכות שלכם התעדכנו בהתאם למה ששמור במשתמש שלכם",

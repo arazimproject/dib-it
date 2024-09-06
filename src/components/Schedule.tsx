@@ -3,6 +3,7 @@ import { useColorScheme } from "@mantine/hooks"
 import { DaySchedule, ScheduleView, createTheme } from "react-schedule-view/src"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage } from "../hooks"
+import { useDibIt } from "../models"
 import { getColor } from "../utilities"
 
 const wideScheduleTheme = createTheme("apple", {
@@ -31,20 +32,10 @@ const Schedule = () => {
     key: "Compact View",
     defaultValue: false,
   })
-  const [courses] = useLocalStorage<string[]>({
-    key: "Courses",
-    defaultValue: [],
-  })
-  const [chosenGroups] = useLocalStorage<Record<string, string[]>>({
-    key: "Groups",
-    defaultValue: {},
-  })
+  const [dibIt] = useDibIt()
   const colorScheme = useColorScheme()
 
-  useLocalStorage<Record<string, string>>({
-    key: "Colors",
-    defaultValue: {},
-  })
+  const currentCourses = (dibIt.courses ?? {})[dibIt.semester ?? ""] ?? []
 
   const data: DaySchedule[] = [
     { name: "שישי", events: [] },
@@ -55,13 +46,9 @@ const Schedule = () => {
     { name: "ראשון", events: [] },
   ]
 
-  for (const course of courses) {
-    if (chosenGroups[course] === undefined) {
-      continue
-    }
-
-    for (const group of chosenGroups[course]) {
-      const info = courseInfo[course]?.groups.find((g) => g.group === group)
+  for (const course of currentCourses) {
+    for (const group of course.groups ?? []) {
+      const info = courseInfo[course.id]?.groups.find((g) => g.group === group)
 
       if (info === undefined) {
         continue
@@ -75,7 +62,7 @@ const Schedule = () => {
           data[DAY_INDEX[lesson.day]].events.push({
             startTime: startHour,
             endTime: endHour,
-            title: `${courseInfo[course]?.name} (${lesson.type})`,
+            title: `${courseInfo[course.id]?.name} (${lesson.type})`,
             description: `${lesson.building}  ${lesson.room} ${
               info.lecturer !== null ? " (" + info.lecturer + ")" : ""
             }`,

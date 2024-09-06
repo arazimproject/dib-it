@@ -3,66 +3,35 @@ import { notifications } from "@mantine/notifications"
 import { useState } from "react"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage } from "../hooks"
-import semesterInfo from "../semesterInfo"
-import { getICS, restore, save } from "../serialize"
+import { DibItCourse, useDibIt } from "../models"
+import semesterInfo, { currentSemester } from "../semesterInfo"
+import { getICS } from "../serialize"
 import { downloadFile, uploadJson } from "../utilities"
 import CourseCard from "./CourseCard"
 import GoogleSaveButtons from "./GoogleSaveButtons"
-import plansRaw from "./plans.json"
-const plans: Record<string, Record<string, Record<string, string[]>>> = plansRaw
 
-interface Props {
-  semester: string
-  setSemester: (s: string) => void
-}
-
-const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
+const Sidebar = () => {
   const courseInfo = useCourseInfo()
   const [search, setSearch] = useState("")
   const [compactView, setCompactView] = useLocalStorage<boolean>({
     key: "Sidebar Compact",
     defaultValue: false,
   })
-  let [courses, setCourses] = useLocalStorage<string[]>({
-    key: "Courses",
-    defaultValue: [],
-  })
+  const [dibIt, setDibIt] = useDibIt()
 
-  const [school] = useLocalStorage<string>({
-    key: "School",
-    serialize: true,
-    defaultValue: "",
-  })
-  const [studyPlan] = useLocalStorage<string>({
-    key: "Study Plan",
-    serialize: true,
-    defaultValue: "",
-  })
-  const [showOnlyStudyPlan] = useLocalStorage<boolean>({
-    key: "Show Only Plan Courses",
-    defaultValue: false,
-  })
-
-  if (courses?.length === undefined) {
-    courses = []
+  let currentCourses: DibItCourse[] = []
+  if (!dibIt.semester) {
+    dibIt.semester = currentSemester
   }
 
-  const possiblyFilterPlanOnly = (courses: string[]) => {
-    if (
-      showOnlyStudyPlan &&
-      plans[school] !== undefined &&
-      plans[school][studyPlan] !== undefined
-    ) {
-      const courseSet = new Set()
-      for (const part in plans[school][studyPlan]) {
-        for (const course of plans[school][studyPlan][part]) {
-          courseSet.add(course)
-        }
-      }
-      return courses.filter((c) => courseSet.has(c))
-    }
-    return courses
+  if (
+    dibIt.semester !== undefined &&
+    dibIt.courses !== undefined &&
+    dibIt.courses[dibIt.semester] !== undefined
+  ) {
+    currentCourses = dibIt.courses[dibIt.semester]
   }
+  const semester = dibIt.semester
 
   return (
     <div
@@ -79,7 +48,12 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
       <Select
         mb={10}
         value={semester}
-        onChange={(v) => setSemester(v!)}
+        onChange={(v) => {
+          if (v) {
+            dibIt.semester = v
+            setDibIt({ ...dibIt })
+          }
+        }}
         data={Object.keys(semesterInfo)
           .sort()
           .map((key) => ({ value: key, label: semesterInfo[key].name }))}
@@ -98,7 +72,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
               downloadFile(
                 "dibit.json",
                 "data:text/json;charset=utf-8," +
-                  encodeURIComponent(JSON.stringify(save()))
+                  encodeURIComponent(JSON.stringify(dibIt))
               )
             }
           >
@@ -110,7 +84,7 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
           leftSection={<i className="fa-solid fa-upload" />}
           onClick={async () => {
             const state = await uploadJson()
-            restore(state)
+            setDibIt(state)
           }}
         >
           העלאת מערכת
@@ -123,7 +97,11 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         color="blue"
         style={{ flex: "none" }}
         onClick={async () => {
-          const ics = await getICS(semester, courses, courseInfo)
+          const ics = await getICS(
+            semester,
+            currentCourses.map((course) => course.id),
+            courseInfo
+          )
           downloadFile(
             "calendar.ics",
             "data:text/calendar;charset=utf-8," + encodeURIComponent(ics)
@@ -172,18 +150,22 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
           }
           const courseId = split[split.length - 1].split(")")[0]
           if (courseInfo[courseId] !== undefined) {
-            setCourses([...courses, courseId])
             setSearch("")
+            if (!dibIt.courses) {
+              dibIt.courses = {}
+            }
+            if (!dibIt.courses[semester]) {
+              dibIt.courses[semester] = []
+            }
+            dibIt.courses[semester].push({ id: courseId })
+            setDibIt({ ...dibIt })
           } else {
             setSearch(courseName)
           }
         }}
-        data={possiblyFilterPlanOnly(
-          courses.includes !== undefined
-            ? Object.keys(courseInfo).filter((id) => !courses.includes(id))
-            : Object.keys(courseInfo)
-        )
-          .map((id) => `${courseInfo[id]?.name} (${id})`)
+        data={Object.keys(courseInfo)
+          .filter((id) => !currentCourses.some((course) => course.id === id))
+          .map((courseId) => `${courseInfo[courseId]?.name} (${courseId})`)
           .sort()}
         leftSection={<i className="fa-solid fa-search" />}
         placeholder="חיפוש"
@@ -198,13 +180,10 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
         onChange={(e) => setCompactView(e.currentTarget.checked)}
       />
 
-      {courses.map((courseId, index) => (
+      {currentCourses.map((_, index) => (
         <CourseCard
           key={index}
           index={index}
-          courseId={courseId}
-          courses={courses}
-          setCourses={setCourses}
           semester={semester}
           compactView={compactView}
         />

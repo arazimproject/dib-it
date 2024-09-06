@@ -1,5 +1,5 @@
 import hash from "./color-hash"
-import { getLocalStorage } from "./hooks"
+import { DibItCourse } from "./models"
 
 export const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
 
@@ -31,16 +31,8 @@ export const getClosestValue = (value: number, sortedList: number[]) => {
   return sortedList[high]
 }
 
-/**
- * Gets the color of a course.
- * If the user configured the color, it returns the user's color (stored in local storage).
- * Otherwise it returns a color hash of the course id.
- */
-export const getColor = (courseId: string): string => {
-  if (courseId === undefined) {
-    return ""
-  }
-  return getLocalStorage("Colors")[courseId] ?? hash.hex(courseId)
+export const getColor = (course: DibItCourse): string => {
+  return course.color ?? hash.hex(course.id)
 }
 
 export const downloadFile = (filename: string, contents: string) => {
@@ -50,7 +42,7 @@ export const downloadFile = (filename: string, contents: string) => {
   element.click()
 }
 
-export const uploadJson = () => {
+export const uploadJson = (): Promise<any> => {
   return new Promise((resolve, reject) => {
     const element = document.getElementById("upload") as HTMLInputElement
     element.onchange = () => {

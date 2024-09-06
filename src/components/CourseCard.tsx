@@ -1,41 +1,28 @@
 import { Button, Checkbox, ColorInput } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
-import { useLocalStorage } from "../hooks"
+import { useDibIt } from "../models"
 import semesterInfo from "../semesterInfo"
 import { getColor } from "../utilities"
 
-interface Props {
-  courseId: string
+export interface CourseCardProps {
   index: number
-  courses: string[]
-  setCourses: React.Dispatch<React.SetStateAction<string[]>>
   semester: string
   compactView: boolean
 }
 
-const CourseCard: React.FC<Props> = ({
-  courseId,
-  index,
-  courses,
-  setCourses,
-  semester,
-  compactView,
-}) => {
-  const courseIdWithDash =
-    courseId.substring(0, 4) + "-" + courseId.substring(4)
+const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
+  const [dibIt, setDibIt] = useDibIt()
+  const course = dibIt.courses![semester][index]
 
-  const [chosenGroups, setChosenGroups] = useLocalStorage<
-    Record<string, string[]>
-  >({ key: "Groups", defaultValue: {} })
-  const [customColors, setCustomColors] = useLocalStorage<
-    Record<string, string>
-  >({ key: "Colors", defaultValue: {} })
+  const courseIdWithDash =
+    course.id.substring(0, 4) + "-" + course.id.substring(4)
+
   const courseInfo = useCourseInfo()
-  const courseColor = getColor(courseId)
+  const courseColor = getColor(course)
 
   return (
     <div
-      key={courseId}
+      key={course.id}
       className="card"
       style={{
         backgroundColor: courseColor,
@@ -53,7 +40,7 @@ const CourseCard: React.FC<Props> = ({
           marginBottom: 10,
         }}
       >
-        <b>{`${courseInfo[courseId]?.name} (${courseId})`}</b>
+        <b>{`${courseInfo[course.id]?.name} (${course.id})`}</b>
         <div style={{ flexGrow: 1 }} />
         <div
           style={{
@@ -68,26 +55,26 @@ const CourseCard: React.FC<Props> = ({
               className="fa-solid fa-chevron-up"
               style={{ cursor: "pointer" }}
               onClick={() => {
-                ;[courses[index], courses[index - 1]] = [
-                  courses[index - 1],
-                  courses[index],
-                ]
-                setCourses(courses)
+                const previous = dibIt.courses![semester][index - 1]
+                const current = dibIt.courses![semester][index]
+                dibIt.courses![semester][index] = previous
+                dibIt.courses![semester][index - 1] = current
+                setDibIt({ ...dibIt })
               }}
             />
           )}
-          {index !== courses?.length - 1 && (
+          {index !== dibIt.courses![semester]?.length - 1 && (
             <i
               className="fa-solid fa-chevron-down"
               style={{
                 cursor: "pointer",
               }}
               onClick={() => {
-                ;[courses[index], courses[index + 1]] = [
-                  courses[index + 1],
-                  courses[index],
-                ]
-                setCourses(courses)
+                const next = dibIt.courses![semester][index + 1]
+                const current = dibIt.courses![semester][index]
+                dibIt.courses![semester][index] = next
+                dibIt.courses![semester][index + 1] = current
+                setDibIt({ ...dibIt })
               }}
             />
           )}
@@ -96,13 +83,12 @@ const CourseCard: React.FC<Props> = ({
           className="fa-solid fa-trash"
           style={{ cursor: "pointer" }}
           onClick={() => {
-            setCourses(courses.filter((c) => c !== courseId))
-            chosenGroups[courseId] = []
-            setChosenGroups({ ...chosenGroups })
+            dibIt.courses![semester].splice(index, 1)
+            setDibIt({ ...dibIt })
           }}
         />
       </div>
-      {courseInfo[courseId]?.groups.map((group) => (
+      {courseInfo[course.id]?.groups.map((group) => (
         <div
           key={group.group}
           style={{ display: "flex", alignItems: "center" }}
@@ -110,22 +96,18 @@ const CourseCard: React.FC<Props> = ({
           <Checkbox
             styles={{ input: { cursor: "pointer" } }}
             ml={10}
-            checked={
-              chosenGroups[courseId] !== undefined &&
-              chosenGroups[courseId].includes !== undefined &&
-              chosenGroups[courseId].includes(group.group)
-            }
+            checked={course.groups?.includes(group.group)}
             onChange={() => {
-              if (chosenGroups[courseId] === undefined) {
-                chosenGroups[courseId] = []
+              if (!course.groups) {
+                course.groups = []
               }
-              const index = chosenGroups[courseId].indexOf(group.group)
+              const index = course.groups.indexOf(group.group)
               if (index !== -1) {
-                chosenGroups[courseId].splice(index, 1)
+                course.groups.splice(index, 1)
               } else {
-                chosenGroups[courseId].push(group.group)
+                course.groups.push(group.group)
               }
-              setChosenGroups({ ...chosenGroups })
+              setDibIt({ ...dibIt })
             }}
           />
           {group.group} ({group.lessons[0].type}): {group.lecturer}
@@ -139,7 +121,8 @@ const CourseCard: React.FC<Props> = ({
               size="md"
               value={courseColor}
               onChange={(color) => {
-                setCustomColors({ ...customColors, [courseId]: color })
+                course.color = color
+                setDibIt({ ...dibIt })
               }}
             />
           </div>
@@ -164,7 +147,7 @@ const CourseCard: React.FC<Props> = ({
               fullWidth
               leftSection={<i className="fa-solid fa-line-chart" />}
               type="submit"
-              form={"bidding-stats-" + courseId}
+              form={"bidding-stats-" + course.id}
             >
               בידינג
             </Button>
@@ -174,7 +157,7 @@ const CourseCard: React.FC<Props> = ({
               fullWidth
               leftSection={<i className="fa-solid fa-search" />}
               type="submit"
-              form={"ims-search-" + courseId}
+              form={"ims-search-" + course.id}
             >
               תוצאות חיפוש
             </Button>
@@ -187,7 +170,7 @@ const CourseCard: React.FC<Props> = ({
             mt="xs"
             leftSection={<i className="fa-solid fa-file-lines" />}
             component="a"
-            href={`https://arazim-project.com/tau-search/?courseNumber=${courseId}&year=&showOnlyWithExams=true`}
+            href={`https://arazim-project.com/tau-search/?courseNumber=${course.id}&year=&showOnlyWithExams=true`}
             target="_blank"
           >
             מבחני עבר (קישורים ל-Moodle)
@@ -196,10 +179,10 @@ const CourseCard: React.FC<Props> = ({
           <form
             action="https://www.ims.tau.ac.il/tal/kr/Search_L.aspx"
             method="POST"
-            id={"ims-search-" + courseId}
+            id={"ims-search-" + course.id}
             target="_blank"
           >
-            <input type="hidden" name="txtKurs" value={courseId} />
+            <input type="hidden" name="txtKurs" value={course.id} />
             <input
               type="hidden"
               name="lstYear"
@@ -209,7 +192,7 @@ const CourseCard: React.FC<Props> = ({
           <form
             action="https://www.ims.tau.ac.il/Bidd/Stats/Stats_L.aspx"
             method="POST"
-            id={"bidding-stats-" + courseId}
+            id={"bidding-stats-" + course.id}
             target="_blank"
           >
             <input type="hidden" name="lstFacBidd" value="0300" />
@@ -219,7 +202,7 @@ const CourseCard: React.FC<Props> = ({
               name="sem"
               value={semesterInfo[semester].semesterNumber}
             />
-            <input type="hidden" name="txtKurs" value={courseId} />
+            <input type="hidden" name="txtKurs" value={course.id} />
           </form>
         </>
       )}

@@ -9,37 +9,13 @@ import Header from "./components/Header"
 import Schedule from "./components/Schedule"
 import Sidebar from "./components/Sidebar"
 import StudyPlan from "./components/StudyPlan"
-import { getLocalStorage, setLocalStorage, useLocalStorage } from "./hooks"
-import { currentSemester } from "./semesterInfo"
+import { DibIt, useDibIt } from "./models"
 
-const switchSemesterLocalStorage = (
-  oldSemester: string,
-  newSemester: string
-) => {
-  setLocalStorage("Courses " + oldSemester, getLocalStorage("Courses"))
-  setLocalStorage("Groups " + oldSemester, getLocalStorage("Groups"))
-  setLocalStorage("Colors " + oldSemester, getLocalStorage("Colors"))
-  let courses = getLocalStorage("Courses " + newSemester, [])
-  if (courses.length === undefined) {
-    courses = []
-  }
-  setLocalStorage("Courses", courses)
-  setLocalStorage("Groups", getLocalStorage("Groups " + newSemester))
-  setLocalStorage("Colors", getLocalStorage("Colors " + newSemester))
-}
-
-const sumHours = (
-  courses: Record<string, Course>,
-  chosenCourses: string[],
-  chosenGroups: Record<string, string[]>
-) => {
+const sumHours = (courses: Record<string, Course>, dibIt: DibIt) => {
   let hours = 0
-  for (const course in chosenGroups) {
-    if (!chosenCourses.includes(course)) {
-      continue
-    }
-    for (const group of chosenGroups[course]) {
-      const info = courses[course]?.groups.find((g) => g.group === group)
+  for (const course of (dibIt.courses ?? {})[dibIt.semester ?? ""] ?? []) {
+    for (const group of course.groups ?? []) {
+      const info = courses[course.id]?.groups.find((g) => g.group === group)
 
       if (info === undefined) {
         continue
@@ -60,30 +36,19 @@ const sumHours = (
 
 const App = () => {
   const colorScheme = useColorScheme()
-
+  const [dibIt] = useDibIt()
   const [tab, setTab] = useState("schedule")
   const [courses, setCourses] = useState<Record<string, Course>>({}) // this is tau-tools scraped jsons from arazim project website
-  const [chosenCourses] = useLocalStorage<string[]>({
-    key: "Courses",
-    defaultValue: [],
-  })
-  const [semester, setSemester] = useLocalStorage<string>({
-    key: "Semester",
-    defaultValue: currentSemester,
-  })
-  const [chosenGroups] = useLocalStorage<Record<string, string[]>>({
-    key: "Groups",
-    defaultValue: {},
-  })
 
-  const hours = sumHours(courses, chosenCourses, chosenGroups)
+  const hours = sumHours(courses, dibIt)
 
   useEffect(() => {
-    if (semester) {
+    if (dibIt.semester) {
+      setCourses({})
       fetch(
-        `https://arazim-project.com/courses/courses-${semester}.json?date=${encodeURIComponent(
-          new Date().toDateString()
-        )}`
+        `https://arazim-project.com/courses/courses-${
+          dibIt.semester
+        }.json?date=${encodeURIComponent(new Date().toDateString())}`
       )
         .then((r) => r.json())
         .then((result) => {
@@ -91,7 +56,7 @@ const App = () => {
         })
         .catch(() => {})
     }
-  }, [semester])
+  }, [dibIt.semester])
 
   return (
     <MantineProvider
@@ -125,13 +90,7 @@ const App = () => {
                 width: "calc(100% - 20px)",
               }}
             >
-              <Sidebar
-                semester={semester}
-                setSemester={(newSemester) => {
-                  setSemester(newSemester)
-                  switchSemesterLocalStorage(semester, newSemester)
-                }}
-              />
+              <Sidebar />
               <div id="content">
                 <div
                   className="adaptive-flex"

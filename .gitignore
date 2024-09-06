@@ -5,3 +5,4 @@ dist
 src/firebase.json
 
 .DS_Store
+scripts/*.json

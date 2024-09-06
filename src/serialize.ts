@@ -1,43 +1,10 @@
 import * as ics from "ics"
 import { Course } from "./CourseInfoContext"
-import { getLocalStorage, setLocalStorage } from "./hooks"
+import { getLocalStorage } from "./hooks"
 import semesterInfo from "./semesterInfo"
 import { parseDateString } from "./utilities"
 
 const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
-
-/**
- * Restore the application state from the given JSON.
- * The JSON should be generated using the {@link save} method.
- */
-export const restore = (json: any) => {
-  for (const key in json) {
-    setLocalStorage(key, json[key])
-  }
-}
-
-/**
- * Store the application state in JSON form.
- * Restoring it with {@link restore} should persist all of the user's courses and application state.
- */
-export const save = () => {
-  const data: Record<string, any> = {}
-
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i)!
-    if (
-      k.startsWith("Courses") ||
-      k.startsWith("Groups") ||
-      k.startsWith("Colors") ||
-      k.includes("Dib It Serialize") ||
-      k === "Semester"
-    ) {
-      data[k] = getLocalStorage(k)
-    }
-  }
-
-  return data
-}
 
 const DAYS = ["א", "ב", "ג", "ד", "ה", "ו", "ש"]
 

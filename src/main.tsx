@@ -9,7 +9,11 @@ import "./index.css"
 
 import "@mantine/core/styles.css"
 import "@mantine/dates/styles.css"
+import { notifications } from "@mantine/notifications"
 import "@mantine/notifications/styles.css"
+import { getLocalStorage } from "./hooks.ts"
+import { DibIt, DibItCourse, getDibIt, setDibIt } from "./models.ts"
+import { currentSemester } from "./semesterInfo.tsx"
 
 const handleDeprecation = () => {
   // Remove "Cached Courses for {semester}", they weigh too much to be in local storage.
@@ -28,9 +32,108 @@ const handleDeprecation = () => {
   for (const key of keysToRemove) {
     localStorage.removeItem(key)
   }
+
+  const data: Record<string, any> = {}
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)!
+    if (
+      k.startsWith("Courses") ||
+      k.startsWith("Groups") ||
+      k.startsWith("Colors") ||
+      k.includes("Dib It Serialize") ||
+      k === "Semester"
+    ) {
+      data[k] = getLocalStorage(k)
+    }
+  }
+
+  if (Object.keys(data).some((x) => x.startsWith("Courses"))) {
+    const result: DibIt = {}
+    let semester = ""
+    if (data["Semester"]) {
+      semester = result.semester = data["Semester"]
+      delete data["Semester"]
+    }
+    if (data["Courses"]) {
+      data[`Courses ${semester}`] = data["Courses"]
+      delete data["Courses"]
+    }
+    if (data["Groups"]) {
+      data[`Groups ${semester}`] = data["Groups"]
+      delete data["Groups"]
+    }
+    if (data["Colors"]) {
+      data[`Colors ${semester}`] = data["Colors"]
+      delete data["Colors"]
+    }
+    if (data["School (Dib It Serialize)"]) {
+      result.school = data["School (Dib It Serialize)"]
+    }
+    if (data["Study Plan (Dib It Serialize)"]) {
+      result.studyPlan = data["Study Plan (Dib It Serialize)"]
+    }
+
+    const keys = Object.keys(data).sort()
+    for (const key of keys) {
+      if (key.startsWith("Courses")) {
+        const semester = key.split(" ")[1]
+        const courses = data[key]
+        const groupsKey = `Groups ${semester}`
+        let groups: any = {}
+        if (data[groupsKey]) {
+          groups = data[groupsKey]
+        }
+        const colorsKey = `Colors ${semester}`
+        let colors: any = {}
+        if (data[colorsKey]) {
+          colors = data[colorsKey]
+        }
+
+        if (!result.courses) {
+          result.courses = {}
+        }
+
+        if (!result.courses[semester]) {
+          result.courses[semester] = []
+        }
+
+        for (const course of courses) {
+          const courseDict: DibItCourse = { id: course }
+          result.courses[semester].push(courseDict)
+          if (groups[course]) {
+            courseDict.groups = groups[course]
+          }
+          if (colors[course]) {
+            courseDict.color = colors[course]
+          }
+        }
+      }
+    }
+
+    localStorage.clear()
+    setDibIt({ ...result })
+    notifications.show({
+      title: "עדכון ה-Dib It בוצע בהצלחה",
+      message:
+        "המערכת שלכם שודרגה לפורמט חדש ותתאים לפיצ׳רים חדשים שאנחנו עובדים עליהם!",
+      style: { direction: "rtl" },
+      icon: <i className="fa-solid fa-check" />,
+      color: "green",
+    })
+  }
+}
+
+const initialize = () => {
+  const dibIt = getDibIt()
+  if (!dibIt.semester) {
+    dibIt.semester = currentSemester
+    setDibIt(dibIt)
+  }
 }
 
 handleDeprecation()
+initialize()
 
 const ErrorFallback: React.FC<FallbackProps> = () => {
   const colorScheme = useColorScheme()

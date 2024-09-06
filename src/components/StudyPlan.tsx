@@ -1,56 +1,26 @@
-import {
-  Autocomplete,
-  Badge,
-  Button,
-  Checkbox,
-  Select,
-  Switch,
-} from "@mantine/core"
+import { Autocomplete, Badge, Checkbox, Select, Switch } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import hash from "../color-hash"
 import { useLocalStorage } from "../hooks"
+import { useDibIt } from "../models"
 import { getClosestValue, parseDateString } from "../utilities"
 import plansRaw from "./plans.json"
 const plans: Record<string, Record<string, Record<string, string[]>>> = plansRaw
 
 const StudyPlan = () => {
-  const [school, setSchool] = useLocalStorage<string>({
-    key: "School",
-    serialize: true,
-    defaultValue: "",
-  })
-  const [studyPlan, setStudyPlan] = useLocalStorage<string>({
-    key: "Study Plan",
-    serialize: true,
-    defaultValue: "",
-  })
-  const [takenCourses, setTakenCourses] = useLocalStorage<
-    Record<string, boolean | undefined>
-  >({ key: "Taken Courses", serialize: true, defaultValue: {} })
-  const [courses, setCourses] = useLocalStorage<string[]>({
-    key: "Courses",
-    defaultValue: [],
-  })
+  const [dibIt, setDibIt] = useDibIt()
   const [sorted, setSorted] = useLocalStorage<boolean>({
     key: "Study Plan Sorted",
     defaultValue: false,
   })
-  const [showOnlyPlanCourses, setShowOnlyPlanCourses] =
-    useLocalStorage<boolean>({
-      key: "Show Only Plan Courses",
-      defaultValue: false,
-    })
-  const [hideTakenCourses, setHideTakenCourses] = useLocalStorage<boolean>({
-    key: "Hiden Taken Courses",
-    defaultValue: false,
-  })
-
   const courseInfo = useCourseInfo()
+
+  const currentCourses = (dibIt.courses ?? {})[dibIt.semester ?? ""] ?? []
 
   let courseDates: number[] = []
   if (sorted) {
-    for (const course of courses) {
-      const examDates = courseInfo[course]?.exams
+    for (const course of currentCourses) {
+      const examDates = courseInfo[course.id]?.exams
       if (examDates?.length !== undefined && examDates.length > 0) {
         for (const date of examDates) {
           const parsedDate = parseDateString(date.date)
@@ -65,10 +35,7 @@ const StudyPlan = () => {
   }
 
   const getSortingValue = (courseId: string) => {
-    if (takenCourses[courseId]) {
-      return 100000000000
-    }
-    if (courses.includes(courseId)) {
+    if (currentCourses.some((course) => course.id === courseId)) {
       return 99999999999
     }
 
@@ -94,14 +61,6 @@ const StudyPlan = () => {
     return a
   }
 
-  const possibleFilterTakenCourses = (a: string[]) => {
-    if (hideTakenCourses) {
-      return a.filter((courseId) => !takenCourses[courseId])
-    }
-
-    return a
-  }
-
   return (
     <div
       style={{
@@ -120,22 +79,26 @@ const StudyPlan = () => {
         label="פקולטה"
         leftSection={<i className="fa-solid fa-school" />}
         data={Object.keys(plans).sort()}
-        value={school}
-        onChange={(e) => {
-          if (e) {
-            setSchool(e)
+        value={dibIt.school}
+        onChange={(v) => {
+          if (v) {
+            dibIt.school = v
+            setDibIt({ ...dibIt })
           }
         }}
       />
-      {plans[school] !== undefined && (
+      {plans[dibIt.school ?? ""] !== undefined && (
         <Autocomplete
           mt="xs"
           size="md"
           label="תוכנית לימוד"
           leftSection={<i className="fa-solid fa-book" />}
-          data={Object.keys(plans[school]).sort()}
-          value={studyPlan}
-          onChange={setStudyPlan}
+          data={Object.keys(plans[dibIt.school!]).sort()}
+          value={dibIt.studyPlan}
+          onChange={(v) => {
+            dibIt.studyPlan = v
+            setDibIt({ ...dibIt })
+          }}
           limit={20}
           maxDropdownHeight={200}
         />
@@ -147,29 +110,15 @@ const StudyPlan = () => {
         checked={sorted}
         onChange={(e) => setSorted(e.currentTarget.checked)}
       />
-      <Switch
-        mt="xs"
-        label="הצג רק קורסים מהתוכנית בחיפוש"
-        checked={showOnlyPlanCourses}
-        onChange={(e) => setShowOnlyPlanCourses(e.currentTarget.checked)}
-      />
-      <Switch
-        mt="xs"
-        label="הסתר קורסים שנלקחו"
-        checked={hideTakenCourses}
-        onChange={(e) => setHideTakenCourses(e.currentTarget.checked)}
-      />
 
-      {plans[school] !== undefined &&
-        plans[school][studyPlan] !== undefined &&
-        Object.keys(plans[school][studyPlan]).map((key) => {
+      {plans[dibIt.school ?? ""] !== undefined &&
+        plans[dibIt.school!][dibIt.studyPlan ?? ""] !== undefined &&
+        Object.keys(plans[dibIt.school!][dibIt.studyPlan!]).map((key) => {
           const textColor = hash.hsl(key)[2] > 0.5 ? "black" : "white"
 
-          const categoryCourses = possibleFilterTakenCourses(
-            plans[school][studyPlan][key].filter(
-              (courseId: string) => courseInfo[courseId] !== undefined
-            )
-          )
+          const categoryCourses = plans[dibIt.school!][dibIt.studyPlan!][
+            key
+          ].filter((courseId: string) => courseInfo[courseId] !== undefined)
 
           if (categoryCourses.length === 0) {
             return <></>
@@ -196,16 +145,7 @@ const StudyPlan = () => {
                 <Checkbox
                   // Convert to boolean to make sure the component doesn't change
                   // from uncontrolled to controlled if this is undefined
-                  checked={takenCourses[courseId] === true}
                   styles={{ input: { cursor: "pointer" } }}
-                  onChange={(e) => {
-                    if (e.currentTarget.checked) {
-                      takenCourses[courseId] = true
-                    } else {
-                      takenCourses[courseId] = undefined
-                    }
-                    setTakenCourses({ ...takenCourses })
-                  }}
                   mb="xs"
                   size="md"
                   key={courseId}
@@ -228,7 +168,7 @@ const StudyPlan = () => {
                           </Badge>
                         )}
 
-                      {courses.includes(courseId) && (
+                      {/* {courses.includes(courseId) && (
                         <Badge
                           ml={5}
                           variant="filled"
@@ -252,7 +192,7 @@ const StudyPlan = () => {
                         >
                           הוספה
                         </Button>
-                      )}
+                      )} */}
                     </>
                   }
                 />
