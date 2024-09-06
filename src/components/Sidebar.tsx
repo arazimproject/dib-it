@@ -147,6 +147,16 @@ const Sidebar: React.FC<Props> = ({ semester, setSemester }) => {
       >
         ייצוא ל-Apple/Google Calendar
       </Button>
+      <Button
+        mt="xs"
+        fullWidth
+        leftSection={<i className="fa-solid fa-print" />}
+        color="violet"
+        style={{ flex: "none" }}
+        onClick={window.print}
+      >
+        הדפסה/שמירה כ-PDF
+      </Button>
 
       <h2>בחירת קורסים</h2>
       <Autocomplete
