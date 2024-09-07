@@ -103,3 +103,33 @@ export const cachedFetch = async <T = any>(url: string): Promise<T> => {
   const result = await fetchUrlValuePromises[url]
   return result
 }
+
+export const useURLValue = <T>(url: string): [Partial<T>, boolean] => {
+  const [value, setValue] = useState<Partial<T>>(cachedUrlValues[url] ?? {})
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const initialValue = cachedUrlValues[url] ?? {}
+    // Already loaded
+    if (Object.keys(initialValue).length !== 0) {
+      setValue(initialValue)
+      return
+    }
+
+    setLoading(true)
+
+    if (fetchUrlValuePromises[url] === undefined) {
+      fetchUrlValuePromises[url] = fetch(url).then((r) => r.json())
+    }
+
+    fetchUrlValuePromises[url]
+      .then((v) => {
+        cachedUrlValues[url] = v
+        setValue(v)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [url])
+
+  return [value, loading]
+}

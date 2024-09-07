@@ -1,9 +1,20 @@
-import { Autocomplete, Badge, Checkbox, Select, Switch } from "@mantine/core"
+import {
+  Autocomplete,
+  Badge,
+  Button,
+  Loader,
+  Select,
+  Switch,
+} from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import hash from "../color-hash"
-import { useLocalStorage } from "../hooks"
+import { useLocalStorage, useURLValue } from "../hooks"
 import { useDibIt } from "../models"
-import { getClosestValue, parseDateString } from "../utilities"
+import {
+  getClosestValue,
+  MILLISECONDS_IN_DAY,
+  parseDateString,
+} from "../utilities"
 import plansRaw from "./plans.json"
 const plans: Record<string, Record<string, Record<string, string[]>>> = plansRaw
 
@@ -14,24 +25,43 @@ const StudyPlan = () => {
     defaultValue: false,
   })
   const courseInfo = useCourseInfo()
+  const [allTimeCourseInfo, loadingAllTimeCourseInfo] = useURLValue<any>(
+    "https://arazim-project.com/courses/courses.json"
+  )
 
-  const currentCourses = (dibIt.courses ?? {})[dibIt.semester ?? ""] ?? []
+  if (!dibIt.courses) {
+    dibIt.courses = {}
+  }
+  if (!dibIt.courses[dibIt.semester!]) {
+    dibIt.courses[dibIt.semester!] = []
+  }
+  const currentCourses = dibIt.courses[dibIt.semester!]
 
   let courseDates: number[] = []
-  if (sorted) {
-    for (const course of currentCourses) {
-      const examDates = courseInfo[course.id]?.exams
-      if (examDates?.length !== undefined && examDates.length > 0) {
-        for (const date of examDates) {
-          const parsedDate = parseDateString(date.date)
-          if (parsedDate) {
-            courseDates.push(parsedDate.getTime())
-          }
+  for (const course of currentCourses) {
+    const examDates = courseInfo[course.id]?.exams
+    if (examDates?.length !== undefined && examDates.length > 0) {
+      for (const date of examDates) {
+        const parsedDate = parseDateString(date.date)
+        if (parsedDate) {
+          courseDates.push(parsedDate.getTime())
         }
       }
     }
+  }
 
-    courseDates.sort()
+  courseDates.sort()
+
+  const getDayDifference = (courseId: string) => {
+    const date = courseInfo[courseId]?.exams
+    if (!date || date.length === 0 || date[0].date === "") {
+      return
+    }
+    const time = parseDateString(date[0].date)?.getTime() ?? 0
+    const difference = Math.round(
+      Math.abs(getClosestValue(time, courseDates) - time) / MILLISECONDS_IN_DAY
+    )
+    return difference
   }
 
   const getSortingValue = (courseId: string) => {
@@ -40,6 +70,7 @@ const StudyPlan = () => {
     }
 
     const date = courseInfo[courseId]!.exams
+
     if (date.length === 0) {
       return -100000000000
     }
@@ -53,9 +84,11 @@ const StudyPlan = () => {
     return -difference
   }
 
-  const possiblySort = (a: string[]) => {
+  const possiblySortAndFilter = (a: string[]) => {
     if (sorted) {
-      a.sort((x, y) => getSortingValue(x) - getSortingValue(y))
+      return a
+        .filter((x) => courseInfo[x] !== undefined)
+        .sort((x, y) => getSortingValue(x) - getSortingValue(y))
     }
 
     return a
@@ -70,10 +103,18 @@ const StudyPlan = () => {
         marginLeft: 10,
       }}
     >
-      <p style={{ marginTop: 5 }}>
-        מוצגים ברשימה רק קורסים שמועברים בסמסטר הקרוב.
-      </p>
-
+      {loadingAllTimeCourseInfo && (
+        <p
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 10,
+          }}
+        >
+          <Loader size="sm" ml="xs" /> טוען מידע על קורסים מכל השנים...
+        </p>
+      )}
       <Select
         mt="xs"
         label="פקולטה"
@@ -106,7 +147,7 @@ const StudyPlan = () => {
 
       <Switch
         mt="xs"
-        label="מיון לפי השתלבות במבחנים"
+        label="הצג רק קורסים שעוברים בסמסטר הנבחר ומיין לפי השתלבות בתקופת מבחנים"
         checked={sorted}
         onChange={(e) => setSorted(e.currentTarget.checked)}
       />
@@ -115,10 +156,7 @@ const StudyPlan = () => {
         plans[dibIt.school!][dibIt.studyPlan ?? ""] !== undefined &&
         Object.keys(plans[dibIt.school!][dibIt.studyPlan!]).map((key) => {
           const textColor = hash.hsl(key)[2] > 0.5 ? "black" : "white"
-
-          const categoryCourses = plans[dibIt.school!][dibIt.studyPlan!][
-            key
-          ].filter((courseId: string) => courseInfo[courseId] !== undefined)
+          const categoryCourses = plans[dibIt.school!][dibIt.studyPlan!][key]
 
           if (categoryCourses.length === 0) {
             return <></>
@@ -141,25 +179,68 @@ const StudyPlan = () => {
               }}
             >
               <h2 style={{ marginBottom: 10 }}>{key}</h2>
-              {possiblySort(categoryCourses).map((courseId: string) => (
-                <Checkbox
-                  // Convert to boolean to make sure the component doesn't change
-                  // from uncontrolled to controlled if this is undefined
-                  styles={{ input: { cursor: "pointer" } }}
-                  mb="xs"
-                  size="md"
-                  key={courseId}
-                  label={
-                    <>
-                      <span style={{ color: textColor }}>
-                        {courseInfo[courseId]?.name} ({courseId})
-                      </span>
+              {possiblySortAndFilter(categoryCourses).map(
+                (courseId: string) => {
+                  const info =
+                    courseInfo[courseId] ?? allTimeCourseInfo[courseId]
+                  const name = info?.name
+                    ? `${info.name} (${courseId})`
+                    : `קורס מספר ${courseId}`
+                  const difference = getDayDifference(courseId)
+                  const included = currentCourses.some(
+                    (course) => course.id === courseId
+                  )
+
+                  return (
+                    <div
+                      key={courseId}
+                      style={{ marginTop: 5, marginBottom: 5 }}
+                    >
+                      <span style={{ color: textColor }}>{name}</span>
+
+                      {courseInfo[courseId] !== undefined && !included && (
+                        <Button
+                          variant="default"
+                          style={{ marginInlineStart: 5 }}
+                          leftSection={<i className="fa-solid fa-plus" />}
+                          size="xs"
+                          onClick={() => {
+                            currentCourses.push({ id: courseId })
+                            setDibIt({ ...dibIt })
+                          }}
+                        >
+                          הוספה
+                        </Button>
+                      )}
+
+                      {included && (
+                        <Badge
+                          mr={5}
+                          variant="filled"
+                          color="green"
+                          leftSection={<i className="fa-solid fa-check" />}
+                        >
+                          נמצא במערכת
+                        </Badge>
+                      )}
+
+                      {!sorted &&
+                        !included &&
+                        courseInfo[courseId] === undefined && (
+                          <Badge
+                            mr={5}
+                            color="red"
+                            leftSection={<i className="fa-solid fa-xmark" />}
+                          >
+                            לא עובר בסמסטר הנבחר
+                          </Badge>
+                        )}
 
                       {courseInfo[courseId] !== undefined &&
                         courseInfo[courseId]!.exams.filter((x) => x.date !== "")
                           .length === 0 && (
                           <Badge
-                            ml={5}
+                            mr={5}
                             variant="filled"
                             color="green"
                             leftSection={<i className="fa-solid fa-check" />}
@@ -168,35 +249,21 @@ const StudyPlan = () => {
                           </Badge>
                         )}
 
-                      {/* {courses.includes(courseId) && (
-                        <Badge
-                          ml={5}
-                          variant="filled"
-                          color="dark"
-                          leftSection={<i className="fa-solid fa-check" />}
-                        >
-                          נמצא במערכת
-                        </Badge>
-                      )}
-
-                      {!courses.includes(courseId) && (
-                        <Button
-                          variant="default"
-                          style={{ marginInlineStart: 5 }}
-                          leftSection={<i className="fa-solid fa-plus" />}
-                          size="xs"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            setCourses([...courses, courseId])
-                          }}
-                        >
-                          הוספה
-                        </Button>
-                      )} */}
-                    </>
-                  }
-                />
-              ))}
+                      {courseInfo[courseId] !== undefined &&
+                        difference !== undefined &&
+                        !included && (
+                          <Badge
+                            mr={5}
+                            variant="default"
+                            leftSection={<i className="fa-solid fa-clock" />}
+                          >
+                            הפרש ימים מהמבחן הכי קרוב: {difference}
+                          </Badge>
+                        )}
+                    </div>
+                  )
+                }
+              )}
             </div>
           )
         })}
