@@ -71,3 +71,6 @@ export const parseDateString = (date: string) => {
 
   return d
 }
+
+export const formatSemester = (semester: string) =>
+  semester.substring(0, 4) + (semester[4] === "a" ? "א'" : "ב'")

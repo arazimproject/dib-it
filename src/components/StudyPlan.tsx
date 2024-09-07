@@ -11,6 +11,7 @@ import hash from "../color-hash"
 import { useLocalStorage, useURLValue } from "../hooks"
 import { useDibIt } from "../models"
 import {
+  formatSemester,
   getClosestValue,
   MILLISECONDS_IN_DAY,
   parseDateString,
@@ -22,6 +23,10 @@ const StudyPlan = () => {
   const [dibIt, setDibIt] = useDibIt()
   const [sorted, setSorted] = useLocalStorage<boolean>({
     key: "Study Plan Sorted",
+    defaultValue: false,
+  })
+  const [hideTakenCourses, setHideTakenCourses] = useLocalStorage<boolean>({
+    key: "Hide Taken Courses",
     defaultValue: false,
   })
   const courseInfo = useCourseInfo()
@@ -85,13 +90,27 @@ const StudyPlan = () => {
   }
 
   const possiblySortAndFilter = (a: string[]) => {
+    let result = [...a]
+    if (hideTakenCourses) {
+      result = result.filter(
+        (x) => courseIdToFirstSemesterTaken[x] === undefined
+      )
+    }
+
     if (sorted) {
-      return a
+      result = result
         .filter((x) => courseInfo[x] !== undefined)
         .sort((x, y) => getSortingValue(x) - getSortingValue(y))
     }
 
-    return a
+    return result
+  }
+
+  const courseIdToFirstSemesterTaken: Record<string, string> = {}
+  for (const semester in dibIt.courses) {
+    for (const course of dibIt.courses[semester]) {
+      courseIdToFirstSemesterTaken[course.id] = semester
+    }
   }
 
   return (
@@ -144,6 +163,13 @@ const StudyPlan = () => {
           maxDropdownHeight={200}
         />
       )}
+
+      <Switch
+        mt="xs"
+        label="הסתר קורסים שנלקחו"
+        checked={hideTakenCourses}
+        onChange={(e) => setHideTakenCourses(e.currentTarget.checked)}
+      />
 
       <Switch
         mt="xs"
@@ -223,6 +249,22 @@ const StudyPlan = () => {
                           נמצא במערכת
                         </Badge>
                       )}
+
+                      {!included &&
+                        courseIdToFirstSemesterTaken[courseId] !==
+                          undefined && (
+                          <Badge
+                            mr={5}
+                            variant="filled"
+                            color="green"
+                            leftSection={<i className="fa-solid fa-check" />}
+                          >
+                            נלקח בסמסטר{" "}
+                            {formatSemester(
+                              courseIdToFirstSemesterTaken[courseId]
+                            )}
+                          </Badge>
+                        )}
 
                       {!sorted &&
                         !included &&
