@@ -169,7 +169,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
             mt={5}
             leftSection={<i className="fa-solid fa-file-lines" />}
             component="a"
-            href={`https://arazim-project.com/tau-search/?courseNumber=${course.id}&year=&showOnlyWithExams=true`}
+            href={`https://arazim-project.com/tau-search/?courseNumber=${course.id}&year=&showOnlyWithExams=true&compactView=true&edit=false`}
             target="_blank"
           >
             מבחני עבר (קישורים ל-Moodle)
