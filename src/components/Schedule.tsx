@@ -1,10 +1,28 @@
 import { Switch } from "@mantine/core"
 import { useColorScheme } from "@mantine/hooks"
-import { DaySchedule, ScheduleView, createTheme } from "react-schedule-view/src"
+import {
+  CalendarEvent,
+  DaySchedule,
+  ScheduleTheme,
+  ScheduleView,
+  createTheme,
+} from "react-schedule-view/src"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage } from "../hooks"
 import { useDibIt } from "../models"
 import { getColor } from "../utilities"
+
+const googleWideScheduleTheme = createTheme("google", {
+  hourHeight: "85px",
+  minorGridlinesPerHour: 1,
+  timeFormatter: (hour: number) => hour.toString() + ":00",
+})
+
+const googleCompactScheduleTheme = createTheme("google", {
+  hourHeight: "65px",
+  minorGridlinesPerHour: 1,
+  timeFormatter: (hour: number) => hour.toString() + ":00",
+})
 
 const wideScheduleTheme = createTheme("apple", {
   hourHeight: "85px",
@@ -15,7 +33,16 @@ const wideScheduleTheme = createTheme("apple", {
 const compactScheduleTheme = createTheme("apple", {
   hourHeight: "65px",
   minorGridlinesPerHour: 1,
+  timeFormatter: (hour: number) => hour.toString() + ":00",
 })
+
+const themes: Record<
+  string,
+  [ScheduleTheme<CalendarEvent>, ScheduleTheme<CalendarEvent>]
+> = {
+  google: [googleCompactScheduleTheme, googleWideScheduleTheme],
+  apple: [compactScheduleTheme, wideScheduleTheme],
+}
 
 const DAY_INDEX: Record<string, number> = {
   א: 5,
@@ -97,7 +124,11 @@ const Schedule = () => {
       >
         <ScheduleView
           darkMode={colorScheme === "dark"}
-          theme={compactView ? compactScheduleTheme : wideScheduleTheme}
+          theme={
+            compactView
+              ? themes[dibIt.theme ?? "apple"][0]
+              : themes[dibIt.theme ?? "apple"][1]
+          }
           daySchedules={data}
           viewStartTime={8}
           viewEndTime={20}

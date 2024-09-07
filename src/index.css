@@ -32,6 +32,10 @@ body,
   line-height: 1.5;
 }
 
+#schedule-container * {
+  font-family: inherit !important;
+}
+
 #schedule-container > div > div {
   line-height: 1;
 }
@@ -42,6 +46,10 @@ body,
 }
 
 #schedule-container > div > div > div > div > :first-child {
+  display: none;
+}
+
+#schedule-container > div > div > div > :nth-child(2) {
   display: none;
 }
 

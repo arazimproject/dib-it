@@ -7,6 +7,7 @@ import Exams from "./components/Exams"
 import Footer from "./components/Footer"
 import Header from "./components/Header"
 import Schedule from "./components/Schedule"
+import Settings from "./components/Settings"
 import Sidebar from "./components/Sidebar"
 import StudyPlan from "./components/StudyPlan"
 import { cachedFetch } from "./hooks"
@@ -147,6 +148,15 @@ const App = () => {
                     >
                       תוכנית
                     </Button>
+                    <Button
+                      className="dont-print"
+                      size="md"
+                      variant={tab === "settings" ? "light" : "subtle"}
+                      leftSection={<i className="fa-solid fa-gears" />}
+                      onClick={() => setTab("settings")}
+                    >
+                      הגדרות
+                    </Button>
                   </Button.Group>
                   <div style={{ flexGrow: 1 }} />
                   <p style={{ fontSize: 22 }}>שעות: {hours}</p>
@@ -155,6 +165,7 @@ const App = () => {
                   {tab === "schedule" && <Schedule />}
                   {tab === "exams" && <Exams />}
                   {tab === "study-plan" && <StudyPlan />}
+                  {tab === "settings" && <Settings />}
                 </div>
               </div>
             </div>
