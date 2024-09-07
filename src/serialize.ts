@@ -1,6 +1,6 @@
 import * as ics from "ics"
 import { Course } from "./CourseInfoContext"
-import { getLocalStorage } from "./hooks"
+import { DibItCourse } from "./models"
 import semesterInfo from "./semesterInfo"
 import { parseDateString } from "./utilities"
 
@@ -10,17 +10,15 @@ const DAYS = ["א", "ב", "ג", "ד", "ה", "ו", "ש"]
 
 export const getICS = (
   semester: string,
-  courses: string[],
+  courses: DibItCourse[],
   courseInfo: Record<string, Course | undefined>
 ): Promise<string> => {
-  const chosenGroups: Record<string, string[]> = getLocalStorage("Groups", {})
-
   return new Promise((resolve, reject) => {
     const info = semesterInfo[semester]
     const events: ics.EventAttributes[] = []
 
-    for (const courseName of courses) {
-      const course = courseInfo[courseName]
+    for (const c of courses) {
+      const course = courseInfo[c.id]
       if (!course) {
         continue
       }
@@ -45,10 +43,7 @@ export const getICS = (
       }
 
       for (const group of course.groups) {
-        if (
-          chosenGroups[courseName] === undefined ||
-          !chosenGroups[courseName].includes(group.group)
-        ) {
+        if (!c.groups?.includes(group.group)) {
           continue
         }
 
@@ -68,8 +63,7 @@ export const getICS = (
 
           events.push({
             title: `${course.name} (${lesson.type})`,
-            description:
-              "מרצה: " + group.lecturer + "\nמספר קורס:" + courseName,
+            description: "מרצה: " + group.lecturer + "\nמספר קורס:" + c.id,
             location: `${lesson.building} ${lesson.room}`,
             start: [
               startDate.getFullYear(),
@@ -102,7 +96,11 @@ export const getICS = (
       }
 
       if (value) {
-        resolve(value)
+        const icsWithTimezone = value.replaceAll(
+          "DTSTART:",
+          "TZID:Asia/Jerusalem\r\nDTSTART:"
+        )
+        resolve(icsWithTimezone)
       }
     })
   })

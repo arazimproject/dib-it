@@ -110,11 +110,7 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
         color="blue"
         style={{ flex: "none" }}
         onClick={async () => {
-          const ics = await getICS(
-            semester,
-            currentCourses.map((course) => course.id),
-            courseInfo
-          )
+          const ics = await getICS(semester, currentCourses, courseInfo)
           downloadFile(
             "calendar.ics",
             "data:text/calendar;charset=utf-8," + encodeURIComponent(ics)
