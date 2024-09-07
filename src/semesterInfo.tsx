@@ -10,6 +10,20 @@ interface SemesterInfo {
 
 // START DATE SHOULD ALWAYS BE A SUNDAY!
 const semesterInfo: Record<string, SemesterInfo> = {
+  "2023a": {
+    name: "תשפ״ג א׳",
+    imsYear: "2022",
+    semesterNumber: 1,
+    startDate: new Date("October 23, 2022 00:00:00"),
+    endDate: new Date("January 22, 2023 00:00:00"),
+  },
+  "2023b": {
+    name: "תשפ״ג ב׳",
+    imsYear: "2022",
+    semesterNumber: 2,
+    startDate: new Date("March 12, 2023 00:00:00"),
+    endDate: new Date("June 30, 2023 00:00:00"),
+  },
   "2024a": {
     name: "תשפ״ד א׳",
     imsYear: "2023",
