@@ -54,7 +54,7 @@ const Header = () => {
           leftSection={<i className="fa-solid fa-sign-in" />}
           onClick={() => signInWithPopup(auth, google)}
         >
-          התחבר
+          התחבר/י
         </Button>
       )}
       {currentUser !== null && currentUser !== undefined && (
@@ -76,7 +76,7 @@ const Header = () => {
             leftSection={<i className="fa-solid fa-sign-out" />}
             onClick={() => signOut(auth)}
           >
-            התנתק
+            התנתק/י
           </Button>
         </>
       )}

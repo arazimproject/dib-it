@@ -5,7 +5,7 @@ const Settings = () => {
   const [dibIt, setDibIt] = useDibIt()
 
   return (
-    <div style={{ maxWidth: 600 }}>
+    <div style={{ maxWidth: 600, marginBottom: 20 }}>
       <Select
         label="עיצוב"
         leftSection={<i className="fa-solid fa-palette" />}

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import CourseContext, { Course } from "./CourseInfoContext"
 import Exams from "./components/Exams"
 import Footer from "./components/Footer"
+import Guide from "./components/Guide"
 import Header from "./components/Header"
 import Schedule from "./components/Schedule"
 import Settings from "./components/Settings"
@@ -118,10 +119,9 @@ const App = () => {
                     marginBottom: 5,
                   }}
                 >
-                  <Button.Group
-                    style={{ maxWidth: "100%", overflow: "hidden" }}
-                  >
+                  <Button.Group style={{ maxWidth: "100%", overflow: "auto" }}>
                     <Button
+                      flex="none"
                       className="dont-print"
                       size="md"
                       variant={tab === "schedule" ? "light" : "subtle"}
@@ -131,6 +131,7 @@ const App = () => {
                       מערכת
                     </Button>
                     <Button
+                      flex="none"
                       className="dont-print"
                       size="md"
                       variant={tab === "exams" ? "light" : "subtle"}
@@ -140,6 +141,7 @@ const App = () => {
                       מבחנים
                     </Button>
                     <Button
+                      flex="none"
                       className="dont-print"
                       size="md"
                       variant={tab === "study-plan" ? "light" : "subtle"}
@@ -149,6 +151,17 @@ const App = () => {
                       תוכנית
                     </Button>
                     <Button
+                      flex="none"
+                      className="dont-print"
+                      size="md"
+                      variant={tab === "guide" ? "light" : "subtle"}
+                      leftSection={<i className="fa-solid fa-info-circle" />}
+                      onClick={() => setTab("guide")}
+                    >
+                      מדריך
+                    </Button>
+                    <Button
+                      flex="none"
                       className="dont-print"
                       size="md"
                       variant={tab === "settings" ? "light" : "subtle"}
@@ -166,6 +179,7 @@ const App = () => {
                   {tab === "exams" && <Exams />}
                   {tab === "study-plan" && <StudyPlan />}
                   {tab === "settings" && <Settings />}
+                  {tab === "guide" && <Guide />}
                 </div>
               </div>
             </div>
