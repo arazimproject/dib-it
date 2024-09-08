@@ -22,6 +22,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
 
   return (
     <div
+      id={`course-${course.id}`}
       key={course.id}
       className="card"
       style={{

@@ -93,6 +93,8 @@ const Schedule = () => {
             description: `${lesson.building}  ${lesson.room} ${
               info.lecturer !== null ? " (" + info.lecturer + ")" : ""
             }`,
+            // @ts-ignore
+            id: course.id,
             color: getColor(course),
           })
         } catch (ignored) {}
@@ -132,6 +134,17 @@ const Schedule = () => {
           daySchedules={data}
           viewStartTime={8}
           viewEndTime={20}
+          handleEventClick={(event) => {
+            // @ts-ignore
+            const id: string = event.id
+
+            const card = document.getElementById(`course-${id}`)
+            if (card) {
+              card.scrollIntoView({ behavior: "instant" })
+              card.style.scale = "1.03"
+              setTimeout(() => (card.style.scale = "1"), 500)
+            }
+          }}
         />
       </div>
     </div>

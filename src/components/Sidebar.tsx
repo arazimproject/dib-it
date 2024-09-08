@@ -50,6 +50,7 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
         flexDirection: "column",
         overflowY: "auto",
         padding: 10,
+        transition: "300ms ease-in-out",
       }}
     >
       {prefetching && (
