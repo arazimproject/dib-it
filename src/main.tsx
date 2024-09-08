@@ -135,7 +135,7 @@ const initialize = () => {
 handleDeprecation()
 initialize()
 
-const ErrorFallback: React.FC<FallbackProps> = () => {
+const ErrorFallback: React.FC<FallbackProps> = ({ error }) => {
   const colorScheme = useColorScheme()
 
   const ls: Record<string, string> = {}
@@ -180,7 +180,14 @@ const ErrorFallback: React.FC<FallbackProps> = () => {
         >
           כפתור המחץ
         </Button>
-        <p>אם יש לכם קשר כלשהו למפתחים, אנא העבירו את זה אליהם:</p>
+        <p>
+          נשמח לנסות לעזור לכם לתקן את הבעייה - אתם מוזמנים לשלוח לנו את התוכן
+          הבא{" "}
+          <a className="link handle text-accent" href="/contact-us">
+            כאן
+          </a>{" "}
+          ונשתדל לעזור לכם לתקן את הבעייה בהקדם!
+        </p>
         <code
           style={{
             maxHeight: 200,
@@ -192,11 +199,17 @@ const ErrorFallback: React.FC<FallbackProps> = () => {
             borderRadius: 10,
             paddingLeft: 10,
             paddingRight: 10,
+            marginTop: 10,
           }}
           dir="ltr"
         >
           <pre>{JSON.stringify(ls, null, 4)}</pre>
         </code>
+        {error?.message && (
+          <p style={{ marginBottom: 10 }}>
+            תוכן השגיאה: <code>{error.message}</code>
+          </p>
+        )}
         <p>
           אתם יכולים גם לשמור את זה אצלכם ולנסות לשחזר מזה את המידע שלכם. אנו
           מתנצלים על התקלה.
