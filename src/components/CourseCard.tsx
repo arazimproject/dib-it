@@ -1,8 +1,9 @@
-import { Button, Checkbox, ColorInput } from "@mantine/core"
+import { Badge, Button, Checkbox, ColorInput, Tooltip } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useDibIt } from "../models"
 import semesterInfo from "../semesterInfo"
 import { getColor, getDefaultColor } from "../utilities"
+import { useURLValue } from "../hooks"
 
 export interface CourseCardProps {
   index: number
@@ -11,6 +12,9 @@ export interface CourseCardProps {
 }
 
 const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
+  const [gradeInfo] = useURLValue<any>(
+    "https://arazim-project.com/courses/grades.json"
+  )
   const [dibIt, setDibIt] = useDibIt()
   const course = dibIt.courses![semester][index]
 
@@ -19,6 +23,19 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
 
   const courseInfo = useCourseInfo()
   const courseColor = getColor(course)
+
+  let sum = 0
+  let count = 0
+  for (const semester in gradeInfo[course.id] ?? {}) {
+    for (const group in gradeInfo[course.id][semester]) {
+      for (const grades of gradeInfo[course.id][semester][group]) {
+        if (grades.mean !== undefined && grades.mean !== 0) {
+          sum += grades.mean
+          count++
+        }
+      }
+    }
+  }
 
   return (
     <div
@@ -38,7 +55,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
         style={{
           display: "flex",
           alignItems: "center",
-          marginBottom: 10,
+          marginBottom: 5,
         }}
       >
         <b>{`${courseInfo[course.id]?.name} (${course.id})`}</b>
@@ -89,6 +106,15 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
           }}
         />
       </div>
+      {!compactView && count !== 0 && (
+        <div style={{ textAlign: "center" }}>
+          <Tooltip label="הממוצע מחושב מ-TAU Factor">
+            <Badge variant="default" mb="xs">
+              ממוצע עבר: {(sum / count).toFixed(2)}
+            </Badge>
+          </Tooltip>
+        </div>
+      )}
       {courseInfo[course.id]?.groups.map((group) => (
         <div
           key={group.group}
