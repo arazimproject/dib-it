@@ -18,9 +18,6 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
   const [dibIt, setDibIt] = useDibIt()
   const course = dibIt.courses![semester][index]
 
-  const courseIdWithDash =
-    course.id.substring(0, 4) + "-" + course.id.substring(4)
-
   const courseInfo = useCourseInfo()
   const courseColor = getColor(course)
 
@@ -161,7 +158,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
               leftSection={<i className="fa-solid fa-chart-column" />}
               onClick={() =>
                 window.open(
-                  `https://www.tau-factor.com/?course=${courseIdWithDash}`,
+                  `https://arazim-project.com/tau-factor/?course=${course.id}`,
                   "_blank"
                 )
               }
