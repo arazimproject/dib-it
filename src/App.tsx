@@ -2,7 +2,7 @@ import { Button, Loader, MantineProvider } from "@mantine/core"
 import { useColorScheme } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useEffect, useState } from "react"
-import CourseContext, { Course } from "./CourseInfoContext"
+import CourseContext from "./CourseInfoContext"
 import Exams from "./components/Exams"
 import Footer from "./components/Footer"
 import Guide from "./components/Guide"
@@ -13,21 +13,21 @@ import Sidebar from "./components/Sidebar"
 import StudyPlan from "./components/StudyPlan"
 import { cachedFetch } from "./hooks"
 import { DibIt, useDibIt } from "./models"
-import semesterInfo from "./semesterInfo"
+import { FIRST_SEMESTER } from "./utilities"
 
-const sumHours = (courses: Record<string, Course>, dibIt: DibIt) => {
+const sumHours = (courses: SemesterCourses, dibIt: DibIt) => {
   let hours = 0
   for (const course of (dibIt.courses ?? {})[dibIt.semester ?? ""] ?? []) {
     for (const group of course.groups ?? []) {
-      const info = courses[course.id]?.groups.find((g) => g.group === group)
+      const info = courses[course.id]?.groups?.find((g) => g.group === group)
 
       if (info === undefined) {
         continue
       }
 
-      for (const lesson of info.lessons) {
+      for (const lesson of info?.lessons ?? []) {
         try {
-          const [startHourStr, endHourStr] = lesson.time.split("-")
+          const [startHourStr, endHourStr] = lesson?.time?.split("-")!
           const startHour = parseInt(startHourStr.split(":")[0], 10)
           const endHour = parseInt(endHourStr.split(":")[0], 10)
           hours += endHour - startHour
@@ -44,7 +44,7 @@ const App = () => {
   const colorScheme = useColorScheme()
   const [dibIt] = useDibIt()
   const [tab, setTab] = useState("schedule")
-  const [courses, setCourses] = useState<Record<string, Course>>({}) // this is tau-tools scraped jsons from arazim project website
+  const [courses, setCourses] = useState<SemesterCourses>({}) // this is tau-tools scraped jsons from arazim project website
   const [prefetching, setPrefetching] = useState(false)
 
   const hours = sumHours(courses, dibIt)
@@ -52,18 +52,23 @@ const App = () => {
   useEffect(() => {
     if (dibIt.semester) {
       setCourses({})
-      cachedFetch(
-        `https://arazim-project.com/courses/courses-${dibIt.semester}.json?${startDateString}`
+      cachedFetch<SemesterCourses>(
+        `https://arazim-project.com/data/courses-${dibIt.semester}.json?${startDateString}`
       )
         .then(async (result) => {
           setCourses(result)
 
           setPrefetching(true)
+          const generalInfo = await cachedFetch<GeneralInfo>(
+            "https://arazim-project.com/data/info.json"
+          )
           const prefetches: Promise<any>[] = []
-          for (const semester of Object.keys(semesterInfo).sort()) {
+          for (const semester of Object.keys(generalInfo.semesters ?? {})
+            .sort()
+            .filter((semester) => semester >= FIRST_SEMESTER)) {
             prefetches.push(
-              cachedFetch(
-                `https://arazim-project.com/courses/courses-${semester}.json?${startDateString}`
+              cachedFetch<SemesterCourses>(
+                `https://arazim-project.com/data/courses-${semester}.json?${startDateString}`
               )
             )
           }

@@ -1,19 +1,19 @@
-import "@fortawesome/fontawesome-free/css/all.min.css"
 import { Button, MantineProvider } from "@mantine/core"
 import { useColorScheme } from "@mantine/hooks"
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { ErrorBoundary, FallbackProps } from "react-error-boundary"
 import App from "./App.tsx"
-import "./index.css"
 
+import "./index.css"
+import "@fortawesome/fontawesome-free/css/all.min.css"
 import "@mantine/core/styles.css"
 import "@mantine/dates/styles.css"
-import { notifications } from "@mantine/notifications"
 import "@mantine/notifications/styles.css"
-import { getLocalStorage } from "./hooks.ts"
+
+import { notifications } from "@mantine/notifications"
+import { cachedFetch, getLocalStorage } from "./hooks.ts"
 import { DibIt, DibItCourse, getDibIt, setDibIt } from "./models.ts"
-import { currentSemester } from "./semesterInfo.tsx"
 
 const handleDeprecation = () => {
   // Remove "Cached Courses for {semester}", they weigh too much to be in local storage.
@@ -124,16 +124,18 @@ const handleDeprecation = () => {
   }
 }
 
-const initialize = () => {
+const initialize = async () => {
+  const generalInfo = await cachedFetch<GeneralInfo>(
+    "https://arazim-project.com/data/info.json"
+  )
   const dibIt = getDibIt()
   if (!dibIt.semester) {
-    dibIt.semester = currentSemester
-    setDibIt(dibIt)
+    setDibIt({ ...dibIt, semester: generalInfo.currentSemester })
   }
 }
 
-handleDeprecation()
 initialize()
+handleDeprecation()
 
 const ErrorFallback: React.FC<FallbackProps> = ({ error }) => {
   const colorScheme = useColorScheme()

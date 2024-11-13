@@ -1,7 +1,18 @@
+import { toHebrewJewishDate } from "jewish-date"
 import hash from "./color-hash"
 import { DibItCourse } from "./models"
 
 export const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
+
+export const SEMESTERS_TO_NUMBER: Record<string, number> = {
+  a: 1,
+  b: 2,
+}
+
+export const SEMESTERS_TO_HEBREW: Record<string, string> = {
+  a: "א'",
+  b: "ב'",
+}
 
 export const getClosestValue = (value: number, sortedList: number[]) => {
   // Binary search the last x that is smaller than value
@@ -74,3 +85,16 @@ export const parseDateString = (date: string) => {
 
 export const formatSemester = (semester: string) =>
   semester.substring(0, 4) + (semester[4] === "a" ? "א'" : "ב'")
+
+export const formatSemesterInHebrew = (semester: string) => {
+  const hebrewSemester = SEMESTERS_TO_HEBREW[semester[4]]
+  const year = parseInt(semester.slice(0, 4), 10)
+  const jewishYear = toHebrewJewishDate({
+    year: year + 3760,
+    monthName: "Tishri",
+    day: 1,
+  })
+  return `${jewishYear.year.slice(1)} ${hebrewSemester}`
+}
+
+export const FIRST_SEMESTER = "2023a"

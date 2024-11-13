@@ -1,8 +1,7 @@
 import { Badge, Button, Checkbox, ColorInput, Tooltip } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useDibIt } from "../models"
-import semesterInfo from "../semesterInfo"
-import { getColor, getDefaultColor } from "../utilities"
+import { getColor, getDefaultColor, SEMESTERS_TO_NUMBER } from "../utilities"
 import { useURLValue } from "../hooks"
 
 export interface CourseCardProps {
@@ -13,7 +12,7 @@ export interface CourseCardProps {
 
 const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
   const [gradeInfo] = useURLValue<any>(
-    "https://arazim-project.com/courses/grades.json"
+    "https://arazim-project.com/data/grades.json"
   )
   const [dibIt, setDibIt] = useDibIt()
   const course = dibIt.courses![semester][index]
@@ -33,6 +32,9 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
       }
     }
   }
+
+  const year = parseInt(semester.slice(0, 4), 10)
+  const imsYear = year - 1
 
   return (
     <div
@@ -112,7 +114,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
           </Tooltip>
         </div>
       )}
-      {courseInfo[course.id]?.groups.map((group) => (
+      {courseInfo[course.id]?.groups?.map((group) => (
         <div
           key={group.group}
           style={{ display: "flex", alignItems: "center" }}
@@ -120,21 +122,21 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
           <Checkbox
             styles={{ input: { cursor: "pointer" } }}
             ml={10}
-            checked={course.groups?.includes(group.group)}
+            checked={course.groups?.includes(group.group!) ?? false}
             onChange={() => {
               if (!course.groups) {
                 course.groups = []
               }
-              const index = course.groups.indexOf(group.group)
+              const index = course.groups.indexOf(group.group!)
               if (index !== -1) {
                 course.groups.splice(index, 1)
               } else {
-                course.groups.push(group.group)
+                course.groups.push(group.group!)
               }
               setDibIt({ ...dibIt })
             }}
           />
-          {group.group} ({group.lessons[0].type}): {group.lecturer}
+          {group.group} ({group.lessons![0].type}): {group.lecturer}
         </div>
       ))}
       {compactView || (
@@ -206,11 +208,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
             target="_blank"
           >
             <input type="hidden" name="txtKurs" value={course.id} />
-            <input
-              type="hidden"
-              name="lstYear"
-              value={semesterInfo[semester].imsYear}
-            />
+            <input type="hidden" name="lstYear" value={imsYear} />
           </form>
           <form
             action="https://www.ims.tau.ac.il/Bidd/Stats/Stats_L.aspx"
@@ -223,7 +221,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
             <input
               type="hidden"
               name="sem"
-              value={semesterInfo[semester].semesterNumber}
+              value={SEMESTERS_TO_NUMBER[semester[4]]}
             />
             <input type="hidden" name="txtKurs" value={course.id} />
           </form>

@@ -1,8 +1,7 @@
 import * as ics from "ics"
-import { Course } from "./CourseInfoContext"
 import { DibItCourse } from "./models"
-import semesterInfo from "./semesterInfo"
 import { parseDateString } from "./utilities"
+import { cachedFetch } from "./hooks"
 
 const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
 
@@ -11,10 +10,18 @@ const DAYS = ["א", "ב", "ג", "ד", "ה", "ו", "ש"]
 export const getICS = (
   semester: string,
   courses: DibItCourse[],
-  courseInfo: Record<string, Course | undefined>
+  courseInfo: SemesterCourses
 ): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const info = semesterInfo[semester]
+  return new Promise(async (resolve, reject) => {
+    const generalInfo = await cachedFetch<GeneralInfo>(
+      "https://arazim-project.com/data/info.json"
+    )
+    const info = (generalInfo.semesters ?? {})[semester]
+    if (!info || !info.startDate || !info.endDate) {
+      reject()
+      return
+    }
+
     const events: ics.EventAttributes[] = []
 
     for (const c of courses) {
@@ -23,8 +30,8 @@ export const getICS = (
         continue
       }
 
-      for (const exam of course.exams) {
-        const date = parseDateString(exam.date)
+      for (const exam of course?.exams ?? []) {
+        const date = parseDateString(exam.date!)
         if (date === undefined) {
           continue
         }
@@ -42,23 +49,23 @@ export const getICS = (
         })
       }
 
-      for (const group of course.groups) {
-        if (!c.groups?.includes(group.group)) {
+      for (const group of course?.groups ?? []) {
+        if (!c.groups?.includes(group.group!)) {
           continue
         }
 
-        for (const lesson of group.lessons) {
+        for (const lesson of group?.lessons ?? []) {
           if (lesson.time === "") {
             continue
           }
 
-          const [startHourStr, endHourStr] = lesson.time.split("-")
+          const [startHourStr, endHourStr] = lesson?.time?.split("-")!
           const startHour = parseInt(startHourStr.split(":")[0], 10)
           const endHour = parseInt(endHourStr.split(":")[0], 10)
 
           const startDate = new Date(
-            info.startDate.getTime() +
-              DAYS.indexOf(lesson.day) * MILLISECONDS_IN_DAY
+            new Date(info.startDate).getTime() +
+              DAYS.indexOf(lesson.day!) * MILLISECONDS_IN_DAY
           )
 
           events.push({
@@ -75,7 +82,7 @@ export const getICS = (
             duration: { hours: endHour - startHour },
             recurrenceRule:
               "FREQ=WEEKLY;UNTIL=" +
-              info.endDate
+              new Date(info.endDate)
                 .toISOString()
                 .replaceAll("-", "")
                 .replaceAll(":", "")

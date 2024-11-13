@@ -7,13 +7,17 @@ import {
   Tooltip,
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useCourseInfo } from "../CourseInfoContext"
-import { useLocalStorage } from "../hooks"
+import { useLocalStorage, useURLValue } from "../hooks"
 import { DibItCourse, useDibIt } from "../models"
-import semesterInfo, { currentSemester } from "../semesterInfo"
 import { getICS } from "../serialize"
-import { downloadFile, uploadJson } from "../utilities"
+import {
+  downloadFile,
+  FIRST_SEMESTER,
+  formatSemesterInHebrew,
+  uploadJson,
+} from "../utilities"
 import CourseCard from "./CourseCard"
 import GoogleSaveButtons from "./GoogleSaveButtons"
 
@@ -25,10 +29,20 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
     defaultValue: false,
   })
   const [dibIt, setDibIt] = useDibIt()
+  const [generalInfo] = useURLValue<GeneralInfo>(
+    "https://arazim-project.com/data/info.json"
+  )
 
   let currentCourses: DibItCourse[] = []
+  useEffect(() => {
+    if (!dibIt.semester) {
+      dibIt.semester = generalInfo.currentSemester
+    }
+    setDibIt({ ...dibIt })
+  }, [generalInfo])
+
   if (!dibIt.semester) {
-    dibIt.semester = currentSemester
+    return <></>
   }
 
   if (
@@ -68,9 +82,13 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
             setDibIt({ ...dibIt })
           }
         }}
-        data={Object.keys(semesterInfo)
+        data={Object.keys(generalInfo.semesters ?? {})
           .sort()
-          .map((key) => ({ value: key, label: semesterInfo[key].name }))}
+          .filter((semester) => semester >= FIRST_SEMESTER)
+          .map((key) => ({
+            value: key,
+            label: formatSemesterInHebrew(key),
+          }))}
         label="סמסטר"
         leftSection={<i className="fa-solid fa-cloud-moon" />}
       />

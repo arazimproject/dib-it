@@ -30,9 +30,8 @@ const StudyPlan = () => {
     defaultValue: false,
   })
   const courseInfo = useCourseInfo()
-  const [allTimeCourseInfo, loadingAllTimeCourseInfo] = useURLValue<any>(
-    "https://arazim-project.com/courses/courses.json"
-  )
+  const [allTimeCourseInfo, loadingAllTimeCourseInfo] =
+    useURLValue<AllTimeCourses>("https://arazim-project.com/data/courses.json")
 
   if (!dibIt.courses) {
     dibIt.courses = {}
@@ -47,7 +46,7 @@ const StudyPlan = () => {
     const examDates = courseInfo[course.id]?.exams
     if (examDates?.length !== undefined && examDates.length > 0) {
       for (const date of examDates) {
-        const parsedDate = parseDateString(date.date)
+        const parsedDate = parseDateString(date.date!)
         if (parsedDate) {
           courseDates.push(parsedDate.getTime())
         }
@@ -62,7 +61,7 @@ const StudyPlan = () => {
     if (!date || date.length === 0 || date[0].date === "") {
       return
     }
-    const time = parseDateString(date[0].date)?.getTime() ?? 0
+    const time = parseDateString(date[0].date!)?.getTime() ?? 0
     const difference = Math.round(
       Math.abs(getClosestValue(time, courseDates) - time) / MILLISECONDS_IN_DAY
     )
@@ -74,7 +73,7 @@ const StudyPlan = () => {
       return 99999999999
     }
 
-    const date = courseInfo[courseId]!.exams
+    const date = courseInfo[courseId]!.exams!
 
     if (date.length === 0) {
       return -100000000000
@@ -84,7 +83,7 @@ const StudyPlan = () => {
       return 0
     }
 
-    const time = parseDateString(date[0].date)?.getTime() ?? 0
+    const time = parseDateString(date[0].date!)?.getTime() ?? 0
     const difference = Math.abs(getClosestValue(time, courseDates) - time)
     return -difference
   }
@@ -279,8 +278,9 @@ const StudyPlan = () => {
                         )}
 
                       {courseInfo[courseId] !== undefined &&
-                        courseInfo[courseId]!.exams.filter((x) => x.date !== "")
-                          .length === 0 && (
+                        courseInfo[courseId]!.exams?.filter(
+                          (x) => x.date !== ""
+                        ).length === 0 && (
                           <Badge
                             mr={5}
                             variant="filled"

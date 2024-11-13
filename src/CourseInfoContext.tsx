@@ -2,34 +2,9 @@
 
 import { createContext, useContext } from "react"
 
-export interface Course {
-  name: string
-  faculty: string
+const CourseInfoContext = createContext<SemesterCourses>({})
 
-  exams: {
-    date: string
-    hour: string
-    moed: string
-    type: string
-  }[]
-
-  groups: {
-    group: string
-    lessons: {
-      building: string
-      day: string
-      type: string
-      room: string
-      semester: string
-      time: string
-    }[]
-    lecturer: string | null
-  }[]
-}
-
-const CourseInfoContext = createContext<Record<string, Course>>({})
-
-export const useCourseInfo = (): Record<string, Course | undefined> => {
+export const useCourseInfo = (): SemesterCourses => {
   return useContext(CourseInfoContext)
 }
 
