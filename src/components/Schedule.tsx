@@ -75,22 +75,22 @@ const Schedule = () => {
 
   for (const course of currentCourses) {
     for (const group of course.groups ?? []) {
-      const info = courseInfo[course.id]?.groups.find((g) => g.group === group)
+      const info = courseInfo[course.id]?.groups?.find((g) => g.group === group)
 
       if (info === undefined) {
         continue
       }
 
-      for (const lesson of info.lessons) {
+      for (const lesson of info.lessons ?? []) {
         try {
-          const [startHourStr, endHourStr] = lesson.time.split("-")
+          const [startHourStr, endHourStr] = lesson.time!.split("-")
           const startHour =
             parseInt(startHourStr.split(":")[0], 10) +
             parseInt(startHourStr.split(":")[1] ?? 0, 10) / 60
           const endHour =
             parseInt(endHourStr.split(":")[0], 10) +
             parseInt(endHourStr.split(":")[1] ?? 0, 10) / 60
-          data[DAY_INDEX[lesson.day]].events.push({
+          data[DAY_INDEX[lesson.day!]].events.push({
             startTime: startHour,
             endTime: endHour,
             title: `${courseInfo[course.id]?.name} (${lesson.type})`,

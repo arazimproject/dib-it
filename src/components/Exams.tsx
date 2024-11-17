@@ -50,15 +50,15 @@ const Exams = () => {
 
   for (const course of currentCourses) {
     for (const date of courseInfo[course.id]?.exams ?? []) {
-      const parsedDate = parseDateString(date.date)
+      const parsedDate = parseDateString(date.date!)
       if (parsedDate === undefined) {
         continue
       }
       examDates.push({
         course,
         date: parsedDate,
-        type: date.type,
-        moed: date.moed,
+        type: date.type!,
+        moed: date.moed!,
       })
       if (dateToExams[parsedDate.toDateString()] === undefined) {
         dateToExams[parsedDate.toDateString()] = []
