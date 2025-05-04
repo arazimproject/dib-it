@@ -1,4 +1,3 @@
-import { Switch } from "@mantine/core"
 import { useColorScheme } from "@mantine/hooks"
 import {
   CalendarEvent,
@@ -55,7 +54,7 @@ const DAY_INDEX: Record<string, number> = {
 
 const Schedule = () => {
   const courseInfo = useCourseInfo()
-  const [compactView, setCompactView] = useLocalStorage<boolean>({
+  const [compactView] = useLocalStorage<boolean>({
     key: "Compact View",
     defaultValue: false,
   })
@@ -115,13 +114,6 @@ const Schedule = () => {
         overflowY: "clip",
       }}
     >
-      <Switch
-        className="dont-print"
-        mt="xs"
-        label={compactView ? "קומפקטי" : "רחב"}
-        checked={compactView}
-        onChange={(e) => setCompactView(e.currentTarget.checked)}
-      />
       <div
         dir="ltr"
         id="schedule-container"

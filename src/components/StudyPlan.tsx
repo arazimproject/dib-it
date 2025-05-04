@@ -11,13 +11,12 @@ import hash from "../color-hash"
 import { useLocalStorage, useURLValue } from "../hooks"
 import { useDibIt } from "../models"
 import {
+  FIRST_SEMESTER,
   formatSemester,
   getClosestValue,
   MILLISECONDS_IN_DAY,
   parseDateString,
 } from "../utilities"
-import plansRaw from "./plans.json"
-const plans: Record<string, Record<string, Record<string, string[]>>> = plansRaw
 
 const StudyPlan = () => {
   const [dibIt, setDibIt] = useDibIt()
@@ -32,6 +31,24 @@ const StudyPlan = () => {
   const courseInfo = useCourseInfo()
   const [allTimeCourseInfo, loadingAllTimeCourseInfo] =
     useURLValue<AllTimeCourses>("https://arazim-project.com/data/courses.json")
+  const [generalInfo] = useURLValue<GeneralInfo>(
+    "https://arazim-project.com/data/info.json"
+  )
+  const [plans] = useURLValue<
+    Record<
+      string,
+      Record<
+        string,
+        Record<
+          string,
+          {
+            courses: Record<string, { id: string; weight: string }>
+            count: number
+          }
+        >
+      >
+    >
+  >(`https://arazim-project.com/data/plans-${dibIt.degreeStartYear}.json`)
 
   if (!dibIt.courses) {
     dibIt.courses = {}
@@ -135,6 +152,22 @@ const StudyPlan = () => {
       )}
       <Select
         mt="xs"
+        allowDeselect
+        label="שנת התחלת התואר"
+        leftSection={<i className="fa-solid fa-calendar" />}
+        value={dibIt?.degreeStartYear === "" ? null : dibIt.degreeStartYear}
+        onChange={(v) => setDibIt({ ...dibIt, degreeStartYear: v ?? "" })}
+        data={[
+          ...new Set(
+            Object.keys(generalInfo.semesters ?? {})
+              .sort()
+              .filter((semester) => semester >= FIRST_SEMESTER)
+              .map((key) => key.slice(0, 4))
+          ),
+        ].sort()}
+      />
+      <Select
+        mt="xs"
         label="פקולטה"
         leftSection={<i className="fa-solid fa-school" />}
         data={Object.keys(plans).sort()}
@@ -152,7 +185,7 @@ const StudyPlan = () => {
           size="md"
           label="תוכנית לימוד"
           leftSection={<i className="fa-solid fa-book" />}
-          data={Object.keys(plans[dibIt.school!]).sort()}
+          data={Object.keys(plans[dibIt.school!] ?? {}).sort()}
           value={dibIt.studyPlan}
           onChange={(v) => {
             dibIt.studyPlan = v
@@ -177,35 +210,38 @@ const StudyPlan = () => {
         onChange={(e) => setSorted(e.currentTarget.checked)}
       />
 
-      {plans[dibIt.school ?? ""] !== undefined &&
-        plans[dibIt.school!][dibIt.studyPlan ?? ""] !== undefined &&
-        Object.keys(plans[dibIt.school!][dibIt.studyPlan!]).map((key) => {
-          const textColor = hash.hsl(key)[2] > 0.5 ? "black" : "white"
-          const categoryCourses = plans[dibIt.school!][dibIt.studyPlan!][key]
+      {(plans[dibIt.school!] ?? {})[dibIt.studyPlan ?? ""] !== undefined &&
+        Object.keys((plans[dibIt.school!] ?? {})[dibIt.studyPlan!]).map(
+          (key) => {
+            const textColor = hash.hsl(key)[2] > 0.5 ? "black" : "white"
+            const categoryCourses = (plans[dibIt.school!] ?? {})[
+              dibIt.studyPlan!
+            ][key]
 
-          if (categoryCourses.length === 0) {
-            return <></>
-          }
+            if (!categoryCourses?.courses) {
+              return <></>
+            }
 
-          return (
-            <div
-              key={key}
-              style={{
-                borderColor: hash.hex(key),
-                borderWidth: 5,
-                borderStyle: "solid",
-                backgroundColor: hash.hex(key) + "bb",
-                color: textColor,
-                marginTop: 10,
-                borderRadius: 10,
-                padding: 5,
-                paddingRight: 10,
-                paddingLeft: 10,
-              }}
-            >
-              <h2 style={{ marginBottom: 10 }}>{key}</h2>
-              {possiblySortAndFilter(categoryCourses).map(
-                (courseId: string) => {
+            return (
+              <div
+                key={key}
+                style={{
+                  borderColor: hash.hex(key),
+                  borderWidth: 5,
+                  borderStyle: "solid",
+                  backgroundColor: hash.hex(key) + "bb",
+                  color: textColor,
+                  marginTop: 10,
+                  borderRadius: 10,
+                  padding: 5,
+                  paddingRight: 10,
+                  paddingLeft: 10,
+                }}
+              >
+                <h2 style={{ marginBottom: 10 }}>{key}</h2>
+                {possiblySortAndFilter(
+                  Object.keys(categoryCourses.courses)
+                ).map((courseId: string) => {
                   const info =
                     courseInfo[courseId] ?? allTimeCourseInfo[courseId]
                   const name = info?.name
@@ -304,11 +340,11 @@ const StudyPlan = () => {
                         )}
                     </div>
                   )
-                }
-              )}
-            </div>
-          )
-        })}
+                })}
+              </div>
+            )
+          }
+        )}
     </div>
   )
 }

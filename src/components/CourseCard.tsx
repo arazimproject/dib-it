@@ -1,8 +1,8 @@
 import { Badge, Button, Checkbox, ColorInput, Tooltip } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
+import { useURLValue } from "../hooks"
 import { useDibIt } from "../models"
 import { getColor, getDefaultColor, SEMESTERS_TO_NUMBER } from "../utilities"
-import { useURLValue } from "../hooks"
 
 export interface CourseCardProps {
   index: number
@@ -96,14 +96,16 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
             />
           )}
         </div>
-        <i
-          className="fa-solid fa-trash"
-          style={{ cursor: "pointer" }}
-          onClick={() => {
-            dibIt.courses![semester].splice(index, 1)
-            setDibIt({ ...dibIt })
-          }}
-        />
+        <Tooltip label="הסרת הקורס">
+          <i
+            className="fa-solid fa-trash"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              dibIt.courses![semester].splice(index, 1)
+              setDibIt({ ...dibIt })
+            }}
+          />
+        </Tooltip>
       </div>
       {!compactView && count !== 0 && (
         <div style={{ textAlign: "center" }}>
@@ -154,16 +156,13 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
           </div>
           <Button.Group mt="xs">
             <Button
+              component="a"
+              href={`https://arazim-project.com/tau-factor/?course=${course.id}`}
+              target="_blank"
               size="xs"
               variant="default"
               fullWidth
               leftSection={<i className="fa-solid fa-chart-column" />}
-              onClick={() =>
-                window.open(
-                  `https://arazim-project.com/tau-factor/?course=${course.id}`,
-                  "_blank"
-                )
-              }
             >
               ציוני עבר
             </Button>

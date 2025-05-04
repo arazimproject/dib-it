@@ -164,7 +164,6 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
         הדפסה/שמירה כ-PDF
       </Button>
 
-      <h2>בחירת קורסים</h2>
       <Autocomplete
         size="md"
         mt={10}
@@ -196,7 +195,7 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
           .map((courseId) => `${courseInfo[courseId]?.name} (${courseId})`)
           .sort()}
         leftSection={<i className="fa-solid fa-search" />}
-        placeholder="חיפוש"
+        placeholder="חיפוש קורסים להוספה"
         limit={20}
         maxDropdownHeight={300}
       />

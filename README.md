@@ -1,7 +1,7 @@
 <h1 align="center">
     <a href="https://arazim-project.com/dib-it/">🗓️ Dib It</a>
     <br />
-    <img src="https://img.shields.io/badge/updated-2024-purple.svg">
+    <img src="https://img.shields.io/badge/updated-2025-purple.svg">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </h1>

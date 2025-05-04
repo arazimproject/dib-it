@@ -10,7 +10,7 @@ const Footer = () => {
       className="footer dont-print"
     >
       <p style={{ margin: "7px" }}>
-        ארזים 2007-2024 &copy; כל הזכויות שמורות. מלבד זכות השתיקה, היא שמורה
+        ארזים 2007-2025 &copy; כל הזכויות שמורות. מלבד זכות השתיקה, היא שמורה
         למרקו (פוגו).
         <a
           className="link handle text-accent"

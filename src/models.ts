@@ -16,8 +16,8 @@ export interface DibIt {
   school?: string
   /** The study plan of the user, like 'תוכנית דו-חוגית במתמטיקה ובמדעי המחשב' */
   studyPlan?: string
-  /** The degree start year of the user, like 2024 */
-  degreeStartYear?: number
+  /** The degree start year of the user, like "2024" */
+  degreeStartYear?: string
   /** The user's theme */
   theme?: string
 }
