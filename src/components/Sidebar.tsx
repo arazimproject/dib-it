@@ -108,7 +108,7 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
               )
             }
           >
-            הורדה
+            גיבוי
           </Button>
         </Tooltip>
         <Button
@@ -119,7 +119,7 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
             setDibIt(state)
           }}
         >
-          העלאת מערכת
+          שחזור
         </Button>
       </Button.Group>
 

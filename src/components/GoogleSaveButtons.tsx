@@ -18,7 +18,7 @@ const GoogleSaveButtons = () => {
 
   return (
     <Button.Group mb={10} style={{ width: "100%" }}>
-      <Tooltip label="שימו לב - מה שנשמר בגוגל זה כל המערכות שלכם (ולא סמסטר ספציפי). פעולה זו תדרוס את כל מה ששמור כרגע!">
+      <Tooltip label="פעולה זו תדרוס את כל מה ששמור כרגע בגוגל!">
         <Button
           color="green"
           style={{ width: "50%" }}
@@ -51,10 +51,10 @@ const GoogleSaveButtons = () => {
               })
           }}
         >
-          שמירה בגוגל
+          גיבוי בגוגל
         </Button>
       </Tooltip>
-      <Tooltip label="שימו לב - מה שנשמר בגוגל זה כל המערכות שלכם (ולא סמסטר ספציפי). פעולה זו תדרוס את כל המערכות שלכם כרגע!">
+      <Tooltip label="פעולה זו תדרוס את כל המערכות שלכם כרגע! מומלץ לגבות לפני כדי שתוכלו לשחזר.">
         <Button
           color="green"
           style={{ width: "50%" }}
@@ -94,7 +94,7 @@ const GoogleSaveButtons = () => {
               })
           }}
         >
-          עדכון מגוגל
+          שחזור מגוגל
         </Button>
       </Tooltip>
     </Button.Group>
