@@ -154,51 +154,55 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
               }}
             />
           </div>
-          <Button.Group mt="xs">
-            <Button
-              component="a"
-              href={`https://arazim-project.com/tau-factor/?course=${course.id}`}
-              target="_blank"
-              size="xs"
-              variant="default"
-              fullWidth
-              leftSection={<i className="fa-solid fa-chart-column" />}
-            >
-              ציוני עבר
-            </Button>
-            <Button
-              size="xs"
-              variant="default"
-              fullWidth
-              leftSection={<i className="fa-solid fa-line-chart" />}
-              type="submit"
-              form={"bidding-stats-" + course.id}
-            >
-              בידינג
-            </Button>
-            <Button
-              size="xs"
-              variant="default"
-              fullWidth
-              leftSection={<i className="fa-solid fa-search" />}
-              type="submit"
-              form={"ims-search-" + course.id}
-            >
-              תוצאות חיפוש
-            </Button>
-          </Button.Group>
-          <Button
-            fullWidth
-            size="xs"
-            variant="default"
-            mt={5}
-            leftSection={<i className="fa-solid fa-file-lines" />}
-            component="a"
-            href={`https://arazim-project.com/tau-search/?courseNumber=${course.id}&year=&showOnlyWithExams=true&compactView=true&edit=false`}
-            target="_blank"
-          >
-            מבחני עבר (קישורים ל-Moodle)
-          </Button>
+          {course.id.length >= 8 && (
+            <>
+              <Button.Group mt="xs">
+                <Button
+                  component="a"
+                  href={`https://arazim-project.com/tau-factor/?course=${course.id}`}
+                  target="_blank"
+                  size="xs"
+                  variant="default"
+                  fullWidth
+                  leftSection={<i className="fa-solid fa-chart-column" />}
+                >
+                  ציוני עבר
+                </Button>
+                <Button
+                  size="xs"
+                  variant="default"
+                  fullWidth
+                  leftSection={<i className="fa-solid fa-line-chart" />}
+                  type="submit"
+                  form={"bidding-stats-" + course.id}
+                >
+                  בידינג
+                </Button>
+                <Button
+                  size="xs"
+                  variant="default"
+                  fullWidth
+                  leftSection={<i className="fa-solid fa-search" />}
+                  type="submit"
+                  form={"ims-search-" + course.id}
+                >
+                  תוצאות חיפוש
+                </Button>
+              </Button.Group>
+              <Button
+                fullWidth
+                size="xs"
+                variant="default"
+                mt={5}
+                leftSection={<i className="fa-solid fa-file-lines" />}
+                component="a"
+                href={`https://arazim-project.com/tau-search/?courseNumber=${course.id}&year=&showOnlyWithExams=true&compactView=true&edit=false`}
+                target="_blank"
+              >
+                מבחני עבר (קישורים ל-Moodle)
+              </Button>
+            </>
+          )}
 
           <form
             action="https://www.ims.tau.ac.il/tal/kr/Search_L.aspx"

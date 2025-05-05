@@ -7,6 +7,7 @@
         "@fortawesome/fontawesome-free": "^6.7.2",
         "@mantine/core": "^7.17.7",
         "@mantine/dates": "^7.17.7",
+        "@mantine/dropzone": "^7.17.7",
         "@mantine/hooks": "^7.17.7",
         "@mantine/notifications": "^7.17.7",
         "color-hash": "^2.0.2",
@@ -17,6 +18,7 @@
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-error-boundary": "^6.0.0",
+        "react-firebase-hooks": "^5.1.1",
         "react-schedule-view": "github:arazimproject/react-schedule-view",
       },
       "devDependencies": {
@@ -220,6 +222,8 @@
     "@mantine/core": ["@mantine/core@7.17.7", "", { "dependencies": { "@floating-ui/react": "^0.26.28", "clsx": "^2.1.1", "react-number-format": "^5.4.3", "react-remove-scroll": "^2.6.2", "react-textarea-autosize": "8.5.9", "type-fest": "^4.27.0" }, "peerDependencies": { "@mantine/hooks": "7.17.7", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x" } }, "sha512-JMyV4/jPATXxmE31g8TJxsrH7XvdrA5pwT4gg25zBl1KE5vLBpBLLjsHG728+bDKuf+bDV+8lw+1kqgW7FcplQ=="],
 
     "@mantine/dates": ["@mantine/dates@7.17.7", "", { "dependencies": { "clsx": "^2.1.1" }, "peerDependencies": { "@mantine/core": "7.17.7", "@mantine/hooks": "7.17.7", "dayjs": ">=1.0.0", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x" } }, "sha512-/F3QteV5Sb5H0zVkU7ZyKdlISYWngdViNLqmredJo8296ukLTsRPr/iIfuYSm3hy3wEWyW5/dWzNPVr1L5cyQg=="],
+
+    "@mantine/dropzone": ["@mantine/dropzone@7.17.7", "", { "dependencies": { "react-dropzone-esm": "15.2.0" }, "peerDependencies": { "@mantine/core": "7.17.7", "@mantine/hooks": "7.17.7", "react": "^18.x || ^19.x", "react-dom": "^18.x || ^19.x" } }, "sha512-z+nxUlvmezv5x2+AvQCzDJZAFmyfcVkjOc/jNZPl8ByMHnF9jSa6doOrOPox+baTn7vrgeDNHB7djQTo6iOFZQ=="],
 
     "@mantine/hooks": ["@mantine/hooks@7.17.7", "", { "peerDependencies": { "react": "^18.x || ^19.x" } }, "sha512-5MIvN/YAcewc97nG3jVrlnFqAExnJRBNWmV6UgGHWbiZiPSCh5o2RJE/5ZVGSfkexDpav9gkm2jkWkIbemVqVA=="],
 
@@ -671,7 +675,11 @@
 
     "react-dom": ["react-dom@19.1.0", "", { "dependencies": { "scheduler": "^0.26.0" }, "peerDependencies": { "react": "^19.1.0" } }, "sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g=="],
 
+    "react-dropzone-esm": ["react-dropzone-esm@15.2.0", "", { "dependencies": { "prop-types": "^15.8.1" }, "peerDependencies": { "react": ">= 16.8 || 18.0.0" } }, "sha512-pPwR8xWVL+tFLnbAb8KVH5f6Vtl397tck8dINkZ1cPMxHWH+l9dFmIgRWgbh7V7jbjIcuKXCsVrXbhQz68+dVA=="],
+
     "react-error-boundary": ["react-error-boundary@6.0.0", "", { "dependencies": { "@babel/runtime": "^7.12.5" }, "peerDependencies": { "react": ">=16.13.1" } }, "sha512-gdlJjD7NWr0IfkPlaREN2d9uUZUlksrfOx7SX62VRerwXbMY6ftGCIZua1VG1aXFNOimhISsTq+Owp725b9SiA=="],
+
+    "react-firebase-hooks": ["react-firebase-hooks@5.1.1", "", { "peerDependencies": { "firebase": ">= 9.0.0", "react": ">= 16.8.0" } }, "sha512-y2UpWs82xs+39q5Rc/wq316ca52QsC0n8m801V+yM4IC4hbfOL4yQPVSh7w+ydstdvjN9F+lvs1WrO2VYxpmdA=="],
 
     "react-is": ["react-is@16.13.1", "", {}, "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="],
 

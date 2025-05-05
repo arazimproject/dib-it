@@ -20,6 +20,8 @@ export interface DibIt {
   degreeStartYear?: string
   /** The user's theme */
   theme?: string
+  /** The user's custom course sources */
+  customCourses?: Record<string, SemesterCourses>
 }
 
 export interface DibItCourse {

@@ -10,6 +10,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css"
 import "@mantine/core/styles.css"
 import "@mantine/dates/styles.css"
 import "@mantine/notifications/styles.css"
+import "@mantine/dropzone/styles.css"
 
 import { notifications } from "@mantine/notifications"
 import { cachedFetch, getLocalStorage } from "./hooks.ts"

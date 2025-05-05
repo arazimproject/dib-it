@@ -2,7 +2,7 @@ import { Button, Loader, MantineProvider } from "@mantine/core"
 import { useColorScheme } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { useEffect, useState } from "react"
-import CourseContext from "./CourseInfoContext"
+import CourseInfoContext from "./CourseInfoContext"
 import Exams from "./components/Exams"
 import Footer from "./components/Footer"
 import Guide from "./components/Guide"
@@ -56,6 +56,9 @@ const App = () => {
         `https://arazim-project.com/data/courses-${dibIt.semester}.json?${startDateString}`
       )
         .then(async (result) => {
+          for (const customCourse of Object.values(dibIt.customCourses ?? {})) {
+            result = { ...result, ...customCourse }
+          }
           setCourses(result)
 
           setPrefetching(true)
@@ -93,7 +96,7 @@ const App = () => {
     >
       <Notifications />
 
-      <CourseContext.Provider value={courses}>
+      <CourseInfoContext.Provider value={courses}>
         <div
           style={{
             display: "flex",
@@ -206,7 +209,7 @@ const App = () => {
           )}
           <Footer />
         </div>
-      </CourseContext.Provider>
+      </CourseInfoContext.Provider>
     </MantineProvider>
   )
 }
