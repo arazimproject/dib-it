@@ -159,7 +159,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
               <Button.Group mt="xs">
                 <Button
                   component="a"
-                  href={`https://arazim-project.com/tau-factor/?course=${course.id}`}
+                  href={`https://arazim-project.com/tau-refactor/?course=${course.id}`}
                   target="_blank"
                   size="xs"
                   variant="default"
