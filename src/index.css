@@ -215,6 +215,7 @@ body,
   }
 }
 
-.mantine-Switch-track {
+.mantine-Switch-track,
+.mantine-Checkbox-input {
   cursor: pointer !important;
 }

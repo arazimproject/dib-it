@@ -8,11 +8,17 @@ export const getLocalStorage = <T = any>(key: string, defaultValue = {}) => {
   ) as T
 }
 
-export const setLocalStorage = (key: string, value = {}) => {
+export const setLocalStorage = (
+  key: string,
+  value = {},
+  options: { quiet?: boolean } = {}
+) => {
   localStorage.setItem(key, JSON.stringify(value))
-  window.dispatchEvent(
-    new StorageEvent("storage", { key, newValue: JSON.stringify(value) })
-  )
+  if (!options.quiet) {
+    window.dispatchEvent(
+      new StorageEvent("storage", { key, newValue: JSON.stringify(value) })
+    )
+  }
 }
 
 interface LocalStorageOptions {
@@ -25,7 +31,7 @@ export const useLocalStorage = <T>({
   key,
   defaultValue,
   serialize,
-}: LocalStorageOptions): [T, React.Dispatch<React.SetStateAction<T>>] => {
+}: LocalStorageOptions) => {
   if (serialize) {
     key += " (Dib It Serialize)"
   }
@@ -54,20 +60,17 @@ export const useLocalStorage = <T>({
     return () => window.removeEventListener("storage", listener)
   }, [key])
 
-  const userSetValue = (newValue: any) => {
+  const userSetValue = (newValue: any, quiet = false) => {
     setValue(newValue)
     if (typeof newValue === "function") {
       newValue = newValue(value)
     }
     if (newValue !== undefined) {
-      localStorage.setItem(key, JSON.stringify(newValue))
-      window.dispatchEvent(
-        new StorageEvent("storage", { key, newValue: JSON.stringify(newValue) })
-      )
+      setLocalStorage(key, newValue, { quiet })
     }
   }
 
-  return [value, userSetValue]
+  return [value, userSetValue] as const
 }
 
 export const useCachedDocumentData = (

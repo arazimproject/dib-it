@@ -7,6 +7,7 @@ import Exams from "./components/Exams"
 import Footer from "./components/Footer"
 import Guide from "./components/Guide"
 import Header from "./components/Header"
+import Practice from "./components/Practice"
 import Schedule from "./components/Schedule"
 import Settings from "./components/Settings"
 import Sidebar from "./components/Sidebar"
@@ -42,8 +43,7 @@ const startDateString = `date=${encodeURIComponent(new Date().toDateString())}`
 
 const App = () => {
   const colorScheme = useColorScheme()
-  const [dibIt] = useDibIt()
-  const [tab, setTab] = useState("schedule")
+  const [dibIt, setDibIt] = useDibIt()
   const [courses, setCourses] = useState<SemesterCourses>({}) // this is tau-tools scraped jsons from arazim project website
   const [prefetching, setPrefetching] = useState(false)
 
@@ -84,6 +84,8 @@ const App = () => {
         .catch(() => {})
     }
   }, [dibIt.semester])
+
+  const tab = dibIt.tab ?? "schedule"
 
   return (
     <MantineProvider
@@ -134,7 +136,9 @@ const App = () => {
                       size="md"
                       variant={tab === "schedule" ? "light" : "subtle"}
                       leftSection={<i className="fa-solid fa-calendar" />}
-                      onClick={() => setTab("schedule")}
+                      onClick={() =>
+                        setDibIt({ ...dibIt, tab: "schedule" }, true)
+                      }
                     >
                       מערכת
                     </Button>
@@ -144,7 +148,7 @@ const App = () => {
                       size="md"
                       variant={tab === "exams" ? "light" : "subtle"}
                       leftSection={<i className="fa-solid fa-list-check" />}
-                      onClick={() => setTab("exams")}
+                      onClick={() => setDibIt({ ...dibIt, tab: "exams" }, true)}
                     >
                       מבחנים
                     </Button>
@@ -154,7 +158,9 @@ const App = () => {
                       size="md"
                       variant={tab === "study-plan" ? "light" : "subtle"}
                       leftSection={<i className="fa-solid fa-table-list" />}
-                      onClick={() => setTab("study-plan")}
+                      onClick={() =>
+                        setDibIt({ ...dibIt, tab: "study-plan" }, true)
+                      }
                     >
                       תוכנית
                     </Button>
@@ -162,9 +168,21 @@ const App = () => {
                       flex="none"
                       className="dont-print"
                       size="md"
+                      variant={tab === "practice" ? "light" : "subtle"}
+                      leftSection={<i className="fa-solid fa-graduation-cap" />}
+                      onClick={() =>
+                        setDibIt({ ...dibIt, tab: "practice" }, true)
+                      }
+                    >
+                      תרגול מבחנים
+                    </Button>
+                    <Button
+                      flex="none"
+                      className="dont-print"
+                      size="md"
                       variant={tab === "guide" ? "light" : "subtle"}
                       leftSection={<i className="fa-solid fa-info-circle" />}
-                      onClick={() => setTab("guide")}
+                      onClick={() => setDibIt({ ...dibIt, tab: "guide" }, true)}
                     >
                       מדריך
                     </Button>
@@ -174,7 +192,9 @@ const App = () => {
                       size="md"
                       variant={tab === "settings" ? "light" : "subtle"}
                       leftSection={<i className="fa-solid fa-gears" />}
-                      onClick={() => setTab("settings")}
+                      onClick={() =>
+                        setDibIt({ ...dibIt, tab: "settings" }, true)
+                      }
                     >
                       הגדרות
                     </Button>
@@ -188,6 +208,7 @@ const App = () => {
                   {tab === "study-plan" && <StudyPlan />}
                   {tab === "settings" && <Settings />}
                   {tab === "guide" && <Guide />}
+                  {tab === "practice" && <Practice />}
                 </div>
               </div>
             </div>
