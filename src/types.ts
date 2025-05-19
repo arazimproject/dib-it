@@ -72,6 +72,8 @@ interface SemesterCourseInfo {
   groups?: SemesterCourseGroupInfo[]
   /** Links to the course's exams in the given semester in the Moodle. Currently only available for exact sciences. */
   exam_links?: string[]
+  /** The prerequisites to the course */
+  prerequisites?: { kind: "any" | "all"; courses: string[] }
 }
 
 /** All information about a given course's exam. */

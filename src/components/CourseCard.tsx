@@ -11,6 +11,9 @@ export interface CourseCardProps {
 }
 
 const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
+  const [allTimeCourseInfo] = useURLValue<AllTimeCourses>(
+    "https://arazim-project.com/data/courses.json"
+  )
   const [gradeInfo] = useURLValue<any>(
     "https://arazim-project.com/data/grades.json"
   )
@@ -35,6 +38,42 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
 
   const year = parseInt(semester.slice(0, 4), 10)
   const imsYear = year - 1
+
+  let requirementsOk = true
+  let missing: string[] = []
+  const prerequisites = courseInfo[course.id]?.prerequisites
+  if (prerequisites?.kind) {
+    const pastCourses = new Set<string>()
+    for (const s of Object.keys(dibIt.courses ?? {}).sort()) {
+      if (s === semester) {
+        break
+      }
+
+      for (const course of dibIt.courses![s]) {
+        pastCourses.add(course.id)
+      }
+    }
+
+    if (prerequisites.kind === "all") {
+      requirementsOk = prerequisites.courses.every((courseId) => {
+        const result = pastCourses.has(courseId)
+        if (!result) {
+          missing.push(courseId)
+        }
+        return result
+      })
+    } else if (prerequisites.kind === "any") {
+      requirementsOk = prerequisites.courses.some((courseId) =>
+        pastCourses.has(courseId)
+      )
+      if (!requirementsOk) {
+        missing = prerequisites.courses
+      }
+    }
+  }
+  const missingString = missing
+    .map((m) => `${allTimeCourseInfo[m]?.name} (${m})`)
+    .join(", ")
 
   return (
     <div
@@ -108,12 +147,33 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
         </Tooltip>
       </div>
       {!compactView && count !== 0 && (
-        <div style={{ textAlign: "center" }}>
-          <Tooltip label="הממוצע מחושב מ-TAU Factor">
-            <Badge variant="default" mb="xs">
+        <div style={{ textAlign: "center", marginBottom: 10 }}>
+          <Tooltip label="הממוצע מחושב מ-TAU Refactor">
+            <Badge
+              variant="default"
+              leftSection={<i className="fa-solid fa-chart-line" />}
+            >
               ממוצע עבר: {(sum / count).toFixed(2)}
             </Badge>
           </Tooltip>
+          {!requirementsOk && (
+            <Tooltip
+              label={
+                "לפי הקורסים שרשומים בסמסטרים קודמים, " +
+                (prerequisites!.kind === "all"
+                  ? `חסרים: ${missingString}`
+                  : `חסר לפחות אחד מבין ${missingString}`)
+              }
+            >
+              <Badge
+                mr={5}
+                color="red"
+                leftSection={<i className="fa-solid fa-exclamation-circle" />}
+              >
+                חסרות דרישות קדם
+              </Badge>
+            </Tooltip>
+          )}
         </div>
       )}
       {courseInfo[course.id]?.groups?.map((group) => (
