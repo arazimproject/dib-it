@@ -5,15 +5,18 @@ import {
   Loader,
   Select,
   Switch,
+  Tooltip,
 } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import hash from "../color-hash"
 import { useLocalStorage, useURLValue } from "../hooks"
 import { useDibIt } from "../models"
 import {
+  checkPrerequisites,
   FIRST_SEMESTER,
   formatSemester,
   getClosestValue,
+  getPastCourses,
   MILLISECONDS_IN_DAY,
   parseDateString,
 } from "../utilities"
@@ -128,6 +131,8 @@ const StudyPlan = () => {
       courseIdToFirstSemesterTaken[course.id] = semester
     }
   }
+
+  const pastCourses = getPastCourses(dibIt, dibIt.semester)
 
   return (
     <div
@@ -251,6 +256,16 @@ const StudyPlan = () => {
                   const included = currentCourses.some(
                     (course) => course.id === courseId
                   )
+                  const missing: string[] = []
+                  const prerequisitesOk = checkPrerequisites(
+                    courseInfo,
+                    courseId,
+                    pastCourses,
+                    missing
+                  )
+                  const missingString = missing
+                    .map((m) => `${courseInfo[m]?.name} (${m})`)
+                    .join(", ")
 
                   return (
                     <div
@@ -301,6 +316,26 @@ const StudyPlan = () => {
                           </Badge>
                         )}
 
+                      {!prerequisitesOk && (
+                        <Tooltip
+                          label={
+                            "לפי הקורסים שרשומים בסמסטרים קודמים, " +
+                            (courseInfo[courseId]?.prerequisites?.kind === "all"
+                              ? `חסרים: ${missingString}`
+                              : `חסר לפחות אחד מבין ${missingString}`)
+                          }
+                        >
+                          <Badge
+                            mr={5}
+                            variant="filled"
+                            color="red"
+                            leftSection={<i className="fa-solid fa-xmark" />}
+                          >
+                            חסרות דרישות קדם
+                          </Badge>
+                        </Tooltip>
+                      )}
+
                       {!sorted &&
                         !included &&
                         courseInfo[courseId] === undefined && (
@@ -329,6 +364,7 @@ const StudyPlan = () => {
 
                       {courseInfo[courseId] !== undefined &&
                         difference !== undefined &&
+                        !isNaN(difference) &&
                         !included && (
                           <Badge
                             mr={5}

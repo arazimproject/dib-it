@@ -2,7 +2,13 @@ import { Badge, Button, Checkbox, ColorInput, Tooltip } from "@mantine/core"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useURLValue } from "../hooks"
 import { useDibIt } from "../models"
-import { getColor, getDefaultColor, SEMESTERS_TO_NUMBER } from "../utilities"
+import {
+  checkPrerequisites,
+  getColor,
+  getDefaultColor,
+  getPastCourses,
+  SEMESTERS_TO_NUMBER,
+} from "../utilities"
 
 export interface CourseCardProps {
   index: number
@@ -39,38 +45,14 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
   const year = parseInt(semester.slice(0, 4), 10)
   const imsYear = year - 1
 
-  let requirementsOk = true
   let missing: string[] = []
-  const prerequisites = courseInfo[course.id]?.prerequisites
-  if (prerequisites?.kind) {
-    const pastCourses = new Set<string>()
-    for (const s of Object.keys(dibIt.courses ?? {}).sort()) {
-      if (s === semester) {
-        break
-      }
-
-      for (const course of dibIt.courses![s]) {
-        pastCourses.add(course.id)
-      }
-    }
-
-    if (prerequisites.kind === "all") {
-      requirementsOk = prerequisites.courses.every((courseId) => {
-        const result = pastCourses.has(courseId)
-        if (!result) {
-          missing.push(courseId)
-        }
-        return result
-      })
-    } else if (prerequisites.kind === "any") {
-      requirementsOk = prerequisites.courses.some((courseId) =>
-        pastCourses.has(courseId)
-      )
-      if (!requirementsOk) {
-        missing = prerequisites.courses
-      }
-    }
-  }
+  const pastCourses = getPastCourses(dibIt, semester)
+  const requirementsOk = checkPrerequisites(
+    courseInfo,
+    course.id,
+    pastCourses,
+    missing
+  )
   const missingString = missing
     .map((m) => `${allTimeCourseInfo[m]?.name} (${m})`)
     .join(", ")
@@ -160,7 +142,7 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
             <Tooltip
               label={
                 "לפי הקורסים שרשומים בסמסטרים קודמים, " +
-                (prerequisites!.kind === "all"
+                (courseInfo[course.id]?.prerequisites?.kind === "all"
                   ? `חסרים: ${missingString}`
                   : `חסר לפחות אחד מבין ${missingString}`)
               }

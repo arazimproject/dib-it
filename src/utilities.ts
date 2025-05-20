@@ -1,6 +1,6 @@
 import { toHebrewJewishDate } from "jewish-date"
 import hash from "./color-hash"
-import { DibItCourse } from "./models"
+import { DibIt, DibItCourse } from "./models"
 
 export const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
 
@@ -98,3 +98,46 @@ export const formatSemesterInHebrew = (semester: string) => {
 }
 
 export const FIRST_SEMESTER = "2023a"
+
+export const getPastCourses = (dibIt: DibIt, until?: string) => {
+  const pastCourses = new Set<string>()
+  for (const s of Object.keys(dibIt.courses ?? {}).sort()) {
+    if (s === until) {
+      break
+    }
+
+    for (const course of dibIt.courses![s]) {
+      pastCourses.add(course.id)
+    }
+  }
+  return pastCourses
+}
+
+export const checkPrerequisites = (
+  courseInfo: SemesterCourses,
+  courseId: string,
+  pastCourses: Set<string>,
+  missing?: string[]
+) => {
+  const prerequisites = courseInfo[courseId]?.prerequisites
+
+  if (prerequisites?.kind === "all") {
+    return prerequisites.courses.every((courseId) => {
+      const result = pastCourses.has(courseId)
+      if (!result) {
+        missing?.push(courseId)
+      }
+      return result
+    })
+  } else if (prerequisites?.kind === "any") {
+    const result = prerequisites.courses.some((courseId) =>
+      pastCourses.has(courseId)
+    )
+    if (!result) {
+      missing?.push(...prerequisites.courses)
+    }
+    return result
+  }
+
+  return true
+}
