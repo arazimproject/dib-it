@@ -16,7 +16,7 @@ import {
   FIRST_SEMESTER,
   formatSemester,
   getClosestValue,
-  getPastCourses,
+  getPastAndPresentCourses,
   MILLISECONDS_IN_DAY,
   parseDateString,
 } from "../utilities"
@@ -132,7 +132,10 @@ const StudyPlan = () => {
     }
   }
 
-  const pastCourses = getPastCourses(dibIt, dibIt.semester)
+  const [pastCourses, pastAndPresentCourses] = getPastAndPresentCourses(
+    dibIt,
+    dibIt.semester
+  )
 
   return (
     <div
@@ -256,16 +259,13 @@ const StudyPlan = () => {
                   const included = currentCourses.some(
                     (course) => course.id === courseId
                   )
-                  const missing: string[] = []
-                  const prerequisitesOk = checkPrerequisites(
-                    courseInfo,
-                    courseId,
+                  const prerequisitesIssue = checkPrerequisites(
+                    courseInfo[courseId]?.prerequisites,
                     pastCourses,
-                    missing
+                    pastAndPresentCourses,
+                    (courseId) =>
+                      `${allTimeCourseInfo[courseId]?.name} (${courseId})`
                   )
-                  const missingString = missing
-                    .map((m) => `${courseInfo[m]?.name} (${m})`)
-                    .join(", ")
 
                   return (
                     <div
@@ -316,13 +316,11 @@ const StudyPlan = () => {
                           </Badge>
                         )}
 
-                      {!prerequisitesOk && (
+                      {prerequisitesIssue !== undefined && (
                         <Tooltip
                           label={
-                            "לפי הקורסים שרשומים בסמסטרים קודמים, " +
-                            (courseInfo[courseId]?.prerequisites?.kind === "all"
-                              ? `חסרים: ${missingString}`
-                              : `חסר לפחות אחד מבין ${missingString}`)
+                            "לפי הקורסים שרשומים בסמסטרים קודמים, חסר " +
+                            prerequisitesIssue
                           }
                         >
                           <Badge

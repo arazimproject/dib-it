@@ -6,7 +6,7 @@ import {
   checkPrerequisites,
   getColor,
   getDefaultColor,
-  getPastCourses,
+  getPastAndPresentCourses,
   SEMESTERS_TO_NUMBER,
 } from "../utilities"
 
@@ -45,17 +45,16 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
   const year = parseInt(semester.slice(0, 4), 10)
   const imsYear = year - 1
 
-  let missing: string[] = []
-  const pastCourses = getPastCourses(dibIt, semester)
-  const requirementsOk = checkPrerequisites(
-    courseInfo,
-    course.id,
-    pastCourses,
-    missing
+  const [pastCourses, pastAndPresentCourses] = getPastAndPresentCourses(
+    dibIt,
+    semester
   )
-  const missingString = missing
-    .map((m) => `${allTimeCourseInfo[m]?.name} (${m})`)
-    .join(", ")
+  const prerequisitesIssue = checkPrerequisites(
+    courseInfo[course.id]?.prerequisites,
+    pastCourses,
+    pastAndPresentCourses,
+    (courseId) => `${allTimeCourseInfo[courseId]?.name} (${courseId})`
+  )
 
   return (
     <div
@@ -128,23 +127,22 @@ const CourseCard = ({ index, semester, compactView }: CourseCardProps) => {
           />
         </Tooltip>
       </div>
-      {!compactView && count !== 0 && (
+      {!compactView && (
         <div style={{ textAlign: "center", marginBottom: 10 }}>
-          <Tooltip label="הממוצע מחושב מ-TAU Refactor">
-            <Badge
-              variant="default"
-              leftSection={<i className="fa-solid fa-chart-line" />}
-            >
-              ממוצע עבר: {(sum / count).toFixed(2)}
-            </Badge>
-          </Tooltip>
-          {!requirementsOk && (
+          {count !== 0 && (
+            <Tooltip label="הממוצע מחושב מ-TAU Refactor">
+              <Badge
+                variant="default"
+                leftSection={<i className="fa-solid fa-chart-line" />}
+              >
+                ממוצע עבר: {(sum / count).toFixed(2)}
+              </Badge>
+            </Tooltip>
+          )}
+          {prerequisitesIssue !== undefined && (
             <Tooltip
               label={
-                "לפי הקורסים שרשומים בסמסטרים קודמים, " +
-                (courseInfo[course.id]?.prerequisites?.kind === "all"
-                  ? `חסרים: ${missingString}`
-                  : `חסר לפחות אחד מבין ${missingString}`)
+                "לפי הקורסים שרשומים בסמסטרים קודמים, חסר " + prerequisitesIssue
               }
             >
               <Badge

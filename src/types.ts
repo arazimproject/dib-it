@@ -73,7 +73,14 @@ interface SemesterCourseInfo {
   /** Links to the course's exams in the given semester in the Moodle. Currently only available for exact sciences. */
   exam_links?: string[]
   /** The prerequisites to the course */
-  prerequisites?: { kind: "any" | "all"; courses: string[] }
+  prerequisites?: SemesterCoursesPrerequisiteCourses
+}
+
+/** A nested tree of requirements, each either "any" or "all". */
+interface SemesterCoursesPrerequisiteCourses {
+  kind?: "any" | "all"
+  courses?: (string | SemesterCoursesPrerequisiteCourses)[]
+  parallel?: SemesterCoursesPrerequisiteCourses
 }
 
 /** All information about a given course's exam. */

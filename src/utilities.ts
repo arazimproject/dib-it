@@ -99,45 +99,82 @@ export const formatSemesterInHebrew = (semester: string) => {
 
 export const FIRST_SEMESTER = "2023a"
 
-export const getPastCourses = (dibIt: DibIt, until?: string) => {
+export const getPastAndPresentCourses = (dibIt: DibIt, until?: string) => {
   const pastCourses = new Set<string>()
+  const pastAndPresentCourses = new Set<string>()
   for (const s of Object.keys(dibIt.courses ?? {}).sort()) {
     if (s === until) {
+      for (const course of dibIt.courses![s]) {
+        pastAndPresentCourses.add(course.id)
+      }
       break
     }
 
     for (const course of dibIt.courses![s]) {
       pastCourses.add(course.id)
+      pastAndPresentCourses.add(course.id)
     }
   }
-  return pastCourses
+  return [pastCourses, pastAndPresentCourses]
 }
 
 export const checkPrerequisites = (
-  courseInfo: SemesterCourses,
-  courseId: string,
+  prerequisites: SemesterCoursesPrerequisiteCourses | undefined,
   pastCourses: Set<string>,
-  missing?: string[]
-) => {
-  const prerequisites = courseInfo[courseId]?.prerequisites
-
-  if (prerequisites?.kind === "all") {
-    return prerequisites.courses.every((courseId) => {
-      const result = pastCourses.has(courseId)
-      if (!result) {
-        missing?.push(courseId)
-      }
-      return result
-    })
-  } else if (prerequisites?.kind === "any") {
-    const result = prerequisites.courses.some((courseId) =>
-      pastCourses.has(courseId)
-    )
-    if (!result) {
-      missing?.push(...prerequisites.courses)
-    }
-    return result
+  pastAndPresentCourses: Set<string>,
+  format?: (courseId: string) => string,
+  root = true
+): string | undefined => {
+  if (!prerequisites) {
+    return
   }
 
-  return true
+  const doesntHaveCourse = (
+    course: string | SemesterCoursesPrerequisiteCourses
+  ) => {
+    if (typeof course === "string") {
+      if (!pastCourses.has(course)) {
+        return format?.(course) ?? course
+      }
+    } else {
+      return checkPrerequisites(
+        course,
+        pastCourses,
+        pastAndPresentCourses,
+        format,
+        false
+      )
+    }
+  }
+
+  if (prerequisites.parallel) {
+    const parallelResults = checkPrerequisites(
+      prerequisites.parallel,
+      pastAndPresentCourses,
+      pastAndPresentCourses,
+      format,
+      root
+    )
+    if (parallelResults) {
+      return "במקביל " + parallelResults
+    }
+  }
+
+  if (!prerequisites.kind || !prerequisites.courses) {
+    return
+  }
+
+  let results = prerequisites?.courses
+    .map(doesntHaveCourse)
+    .filter((r) => r !== undefined)
+  const ok =
+    prerequisites.kind === "all"
+      ? results.length === 0
+      : results.length < prerequisites.courses.length
+  if (ok) {
+    return
+  }
+  const r =
+    prerequisites.kind === "all" ? results.join(" וגם ") : results.join(" או ")
+  return root ? r : `(${r})`
 }
