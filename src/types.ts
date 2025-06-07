@@ -166,7 +166,7 @@ interface GroupBiddingInfo {
   faculty?: string
   /** The maximal bid amount someone did. */
   maximal: number
-  /** The minimal bid amount someone did. */
+  /** The minimal bid amount of someone who received the group. */
   minimal: number
   /** The number of people who wanted the group. */
   wanted: number

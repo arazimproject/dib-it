@@ -7,16 +7,19 @@ import {
 } from "@mantine/core"
 import { useEffect, useState } from "react"
 import autoBid, { getPossibleFaculties } from "../autoBid"
-import { cachedFetch } from "../hooks"
+import { cachedFetch, useLocalStorage } from "../hooks"
 import { DibItCourse } from "../models"
 
 const AutoBidModal = ({ courses }: { courses: DibItCourse[] }) => {
-  const [facultyPoints, setFacultyPoints] = useState<
+  const [facultyPoints, setFacultyPoints] = useLocalStorage<
     { faculty: string; points?: number }[]
-  >([])
+  >({ key: "Auto Bid Faculty Points", defaultValue: [] })
   const [loading, setLoading] = useState(false)
-  const [possibleFaculties, setPossibleFaculties] = useState<
+  const [possibleFaculties, setPossibleFaculties] = useLocalStorage<
     Record<string, string[]>
+  >({ key: "Auto Bid Possible Faculties", defaultValue: {} })
+  const [results, setResults] = useState<
+    Record<string, Record<string, number>>
   >({})
 
   const existingFaculties = facultyPoints
@@ -25,6 +28,7 @@ const AutoBidModal = ({ courses }: { courses: DibItCourse[] }) => {
 
   useEffect(() => {
     setPossibleFaculties({})
+    setResults({})
   }, [facultyPoints])
 
   return (
@@ -129,17 +133,29 @@ const AutoBidModal = ({ courses }: { courses: DibItCourse[] }) => {
           } else {
             newPossibleFaculties = possibleFaculties
           }
-          await autoBid(
-            courses,
-            facultyPoints,
-            newPossibleFaculties,
-            allTimeBiddingInfo
+          setResults(
+            await autoBid(
+              courses,
+              facultyPoints,
+              newPossibleFaculties,
+              allTimeBiddingInfo
+            )
           )
           setLoading(false)
         }}
       >
-        חישוב המלצות
+        חישוב המלצות (2, 3 - שג׳ר!)
       </Button>
+      {Object.keys(results)
+        .sort()
+        .map((faculty, facultyIndex) => (
+          <div key={facultyIndex} style={{ marginTop: 10, whiteSpace: "pre" }}>
+            <h3>מסלול: {faculty}</h3>
+            {Object.keys(results[faculty])
+              .map((course) => `${course}: ${results[faculty][course]} נקודות`)
+              .join("\n")}
+          </div>
+        ))}
     </>
   )
 }

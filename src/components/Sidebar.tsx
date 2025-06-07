@@ -175,7 +175,7 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
 
             <Menu.Item
               leftSection={<i className="fa-solid fa-gavel" />}
-              color="red"
+              color="orange"
               onClick={() =>
                 modals.open({
                   title: "המלצות בידינג אוטומטיות",
@@ -183,8 +183,6 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
                   centered: true,
                 })
               }
-              // TODO: finish this
-              display="none"
             >
               המלצות בידינג אוטומטיות
             </Menu.Item>
