@@ -152,9 +152,12 @@ const Exams = () => {
         defaultDate={firstExam}
         minDate={firstExam}
         maxDate={lastExam}
-        monthLabelFormat={(m) => `${MONTHS[m.getMonth()]} ${m.getFullYear()}`}
-        weekdayFormat={(d) => DAY_LETTERS[d.getDay()] + "'"}
-        renderDay={(date) => {
+        monthLabelFormat={(m) =>
+          `${MONTHS[new Date(m).getMonth()]} ${new Date(m).getFullYear()}`
+        }
+        weekdayFormat={(d) => DAY_LETTERS[new Date(d).getDay()] + "'"}
+        renderDay={(d) => {
+          const date = new Date(d)
           const day = date.getDate()
           const exams = dateToExams[date.toDateString()]
           if (exams !== undefined) {
