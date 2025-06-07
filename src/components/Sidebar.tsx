@@ -6,9 +6,9 @@ import {
   Select,
   Tooltip,
 } from "@mantine/core"
+import { modals } from "@mantine/modals"
 import { notifications } from "@mantine/notifications"
 import { useEffect, useState } from "react"
-import autoBid from "../autoBid"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage, useURLValue } from "../hooks"
 import { DibItCourse, useDibIt } from "../models"
@@ -19,6 +19,7 @@ import {
   formatSemesterInHebrew,
   uploadJson,
 } from "../utilities"
+import AutoBidModal from "./AutoBidModal"
 import CourseCard from "./CourseCard"
 import GoogleSaveButtons from "./GoogleSaveButtons"
 
@@ -175,7 +176,13 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
             <Menu.Item
               leftSection={<i className="fa-solid fa-gavel" />}
               color="red"
-              onClick={() => autoBid(currentCourses)}
+              onClick={() =>
+                modals.open({
+                  title: "המלצות בידינג אוטומטיות",
+                  children: <AutoBidModal courses={currentCourses} />,
+                  centered: true,
+                })
+              }
               // TODO: finish this
               display="none"
             >

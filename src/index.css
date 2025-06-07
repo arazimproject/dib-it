@@ -220,6 +220,8 @@ body,
   cursor: pointer !important;
 }
 
-.mantine-Tooltip-tooltip {
+.mantine-Tooltip-tooltip,
+.mantine-Overlay-root,
+.mantine-Modal-inner {
   z-index: 100000 !important;
 }

@@ -1,5 +1,6 @@
 import { Button, Loader, MantineProvider } from "@mantine/core"
 import { useColorScheme } from "@mantine/hooks"
+import { ModalsProvider } from "@mantine/modals"
 import { Notifications } from "@mantine/notifications"
 import { useEffect, useState } from "react"
 import CourseInfoContext from "./CourseInfoContext"
@@ -96,141 +97,151 @@ const App = () => {
           'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
       }}
     >
-      <Notifications />
+      <ModalsProvider>
+        <Notifications />
 
-      <CourseInfoContext.Provider value={courses}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-            width: "100%",
-            alignItems: "center",
-          }}
-        >
-          <Header />
-          {Object.keys(courses).length !== 0 && (
-            <div
-              id="main"
-              style={{
-                flexGrow: 1,
-                overflowY: "auto",
-                display: "flex",
-                width: "calc(100% - 20px)",
-              }}
-            >
-              <Sidebar prefetching={prefetching} />
-              <div id="content">
-                <div
-                  className="adaptive-flex"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: 5,
-                  }}
-                >
-                  <Button.Group style={{ maxWidth: "100%", overflow: "auto" }}>
-                    <Button
-                      flex="none"
-                      className="dont-print"
-                      size="md"
-                      variant={tab === "schedule" ? "light" : "subtle"}
-                      leftSection={<i className="fa-solid fa-calendar" />}
-                      onClick={() =>
-                        setDibIt({ ...dibIt, tab: "schedule" }, true)
-                      }
+        <CourseInfoContext.Provider value={courses}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+              width: "100%",
+              alignItems: "center",
+            }}
+          >
+            <Header />
+            {Object.keys(courses).length !== 0 && (
+              <div
+                id="main"
+                style={{
+                  flexGrow: 1,
+                  overflowY: "auto",
+                  display: "flex",
+                  width: "calc(100% - 20px)",
+                }}
+              >
+                <Sidebar prefetching={prefetching} />
+                <div id="content">
+                  <div
+                    className="adaptive-flex"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 5,
+                    }}
+                  >
+                    <Button.Group
+                      style={{ maxWidth: "100%", overflow: "auto" }}
                     >
-                      מערכת
-                    </Button>
-                    <Button
-                      flex="none"
-                      className="dont-print"
-                      size="md"
-                      variant={tab === "exams" ? "light" : "subtle"}
-                      leftSection={<i className="fa-solid fa-list-check" />}
-                      onClick={() => setDibIt({ ...dibIt, tab: "exams" }, true)}
-                    >
-                      מבחנים
-                    </Button>
-                    <Button
-                      flex="none"
-                      className="dont-print"
-                      size="md"
-                      variant={tab === "study-plan" ? "light" : "subtle"}
-                      leftSection={<i className="fa-solid fa-table-list" />}
-                      onClick={() =>
-                        setDibIt({ ...dibIt, tab: "study-plan" }, true)
-                      }
-                    >
-                      תוכנית
-                    </Button>
-                    <Button
-                      flex="none"
-                      className="dont-print"
-                      size="md"
-                      variant={tab === "practice" ? "light" : "subtle"}
-                      leftSection={<i className="fa-solid fa-graduation-cap" />}
-                      onClick={() =>
-                        setDibIt({ ...dibIt, tab: "practice" }, true)
-                      }
-                    >
-                      תרגול מבחנים
-                    </Button>
-                    <Button
-                      flex="none"
-                      className="dont-print"
-                      size="md"
-                      variant={tab === "guide" ? "light" : "subtle"}
-                      leftSection={<i className="fa-solid fa-info-circle" />}
-                      onClick={() => setDibIt({ ...dibIt, tab: "guide" }, true)}
-                    >
-                      מדריך
-                    </Button>
-                    <Button
-                      flex="none"
-                      className="dont-print"
-                      size="md"
-                      variant={tab === "settings" ? "light" : "subtle"}
-                      leftSection={<i className="fa-solid fa-gears" />}
-                      onClick={() =>
-                        setDibIt({ ...dibIt, tab: "settings" }, true)
-                      }
-                    >
-                      הגדרות
-                    </Button>
-                  </Button.Group>
-                  <div style={{ flexGrow: 1 }} />
-                  <p style={{ fontSize: 22 }}>שעות: {hours}</p>
-                </div>
-                <div>
-                  {tab === "schedule" && <Schedule />}
-                  {tab === "exams" && <Exams />}
-                  {tab === "study-plan" && <StudyPlan />}
-                  {tab === "settings" && <Settings />}
-                  {tab === "guide" && <Guide />}
-                  {tab === "practice" && <Practice />}
+                      <Button
+                        flex="none"
+                        className="dont-print"
+                        size="md"
+                        variant={tab === "schedule" ? "light" : "subtle"}
+                        leftSection={<i className="fa-solid fa-calendar" />}
+                        onClick={() =>
+                          setDibIt({ ...dibIt, tab: "schedule" }, true)
+                        }
+                      >
+                        מערכת
+                      </Button>
+                      <Button
+                        flex="none"
+                        className="dont-print"
+                        size="md"
+                        variant={tab === "exams" ? "light" : "subtle"}
+                        leftSection={<i className="fa-solid fa-list-check" />}
+                        onClick={() =>
+                          setDibIt({ ...dibIt, tab: "exams" }, true)
+                        }
+                      >
+                        מבחנים
+                      </Button>
+                      <Button
+                        flex="none"
+                        className="dont-print"
+                        size="md"
+                        variant={tab === "study-plan" ? "light" : "subtle"}
+                        leftSection={<i className="fa-solid fa-table-list" />}
+                        onClick={() =>
+                          setDibIt({ ...dibIt, tab: "study-plan" }, true)
+                        }
+                      >
+                        תוכנית
+                      </Button>
+                      <Button
+                        flex="none"
+                        className="dont-print"
+                        size="md"
+                        variant={tab === "practice" ? "light" : "subtle"}
+                        leftSection={
+                          <i className="fa-solid fa-graduation-cap" />
+                        }
+                        onClick={() =>
+                          setDibIt({ ...dibIt, tab: "practice" }, true)
+                        }
+                      >
+                        תרגול מבחנים
+                      </Button>
+                      <Button
+                        flex="none"
+                        className="dont-print"
+                        size="md"
+                        variant={tab === "guide" ? "light" : "subtle"}
+                        leftSection={<i className="fa-solid fa-info-circle" />}
+                        onClick={() =>
+                          setDibIt({ ...dibIt, tab: "guide" }, true)
+                        }
+                      >
+                        מדריך
+                      </Button>
+                      <Button
+                        flex="none"
+                        className="dont-print"
+                        size="md"
+                        variant={tab === "settings" ? "light" : "subtle"}
+                        leftSection={<i className="fa-solid fa-gears" />}
+                        onClick={() =>
+                          setDibIt({ ...dibIt, tab: "settings" }, true)
+                        }
+                      >
+                        הגדרות
+                      </Button>
+                    </Button.Group>
+                    <div style={{ flexGrow: 1 }} />
+                    <p style={{ fontSize: 22 }}>שעות: {hours}</p>
+                  </div>
+                  <div>
+                    {tab === "schedule" && <Schedule />}
+                    {tab === "exams" && <Exams />}
+                    {tab === "study-plan" && <StudyPlan />}
+                    {tab === "settings" && <Settings />}
+                    {tab === "guide" && <Guide />}
+                    {tab === "practice" && <Practice />}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {Object.keys(courses).length === 0 && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-              }}
-            >
-              <p>טוען את הקורסים של הסמסטר...</p>
-              <Loader mt={10} />
-            </div>
-          )}
-          <Footer />
-        </div>
-      </CourseInfoContext.Provider>
+            {Object.keys(courses).length === 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                <p>טוען את הקורסים של הסמסטר...</p>
+                <Loader mt={10} />
+              </div>
+            )}
+            <Footer />
+          </div>
+        </CourseInfoContext.Provider>
+      </ModalsProvider>
     </MantineProvider>
   )
 }
