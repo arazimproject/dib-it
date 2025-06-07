@@ -150,3 +150,30 @@ interface GeneralSemesterInfo {
   /** The end date of the semester (e.g. July 2, 2025 00:00:00). */
   endDate: string
 }
+
+/** All bidding statistics throughout the years. */
+interface AllTimeBiddingInfo {
+  [courseId: string]: {
+    [semester: string]: {
+      [group: string]: GroupBiddingInfo[]
+    }
+  }
+}
+
+/** Statistics about bidding of a specific group of a course in some semester. */
+interface GroupBiddingInfo {
+  /** If the bidding was per-faculty, these statistics are only for the given faculty. */
+  faculty?: string
+  /** The maximal bid amount someone did. */
+  maximal: number
+  /** The minimal bid amount someone did. */
+  minimal: number
+  /** The number of people who wanted the group. */
+  wanted: number
+  /** The numbers of people who received the group. */
+  received: number
+  /** The number of available spots in this current bidding run. */
+  run_available: number
+  /** The total number of available spots in this group. */
+  total_available: number
+}

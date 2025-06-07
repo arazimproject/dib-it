@@ -1,15 +1,12 @@
-import { Button, Tooltip } from "@mantine/core"
+import { Menu, Tooltip } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { doc, getDoc, setDoc } from "firebase/firestore"
-import { useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, firestore } from "../firebase"
 import { useDibIt } from "../models"
 
 const GoogleSaveButtons = () => {
   const [currentUser] = useAuthState(auth)
-  const [restoreLoading, setRestoreLoading] = useState(false)
-  const [saveLoading, setSaveLoading] = useState(false)
   const [dibIt, setDibIt] = useDibIt()
 
   if (!currentUser) {
@@ -17,20 +14,16 @@ const GoogleSaveButtons = () => {
   }
 
   return (
-    <Button.Group mb={10} style={{ width: "100%" }}>
+    <>
       <Tooltip label="פעולה זו תדרוס את כל מה ששמור כרגע בגוגל!">
-        <Button
+        <Menu.Item
           color="green"
-          style={{ width: "50%" }}
           leftSection={<i className="fa-solid fa-save" />}
-          loading={saveLoading}
           onClick={() => {
-            setSaveLoading(true)
             setDoc(doc(firestore, `/users/${currentUser.uid}`), dibIt, {
               merge: true,
             })
               .then(() => {
-                setSaveLoading(false)
                 notifications.show({
                   title: "השמירה בגוגל בוצעה בהצלחה",
                   message: "המערכות שלכם זמינות כעת להורדה במכשירים אחרים",
@@ -40,7 +33,6 @@ const GoogleSaveButtons = () => {
                 })
               })
               .catch((e) => {
-                setSaveLoading(false)
                 notifications.show({
                   title: "שגיאה בשמירה בגוגל",
                   message: "אנא נסו שנית. פרטי השגיאה: " + e?.message,
@@ -52,16 +44,13 @@ const GoogleSaveButtons = () => {
           }}
         >
           גיבוי בגוגל
-        </Button>
+        </Menu.Item>
       </Tooltip>
       <Tooltip label="פעולה זו תדרוס את כל המערכות שלכם כרגע! מומלץ לגבות לפני כדי שתוכלו לשחזר.">
-        <Button
+        <Menu.Item
           color="green"
-          style={{ width: "50%" }}
           leftSection={<i className="fa-solid fa-sync" />}
-          loading={restoreLoading}
           onClick={() => {
-            setRestoreLoading(true)
             getDoc(doc(firestore, `/users/${currentUser.uid}`))
               .then((d) => {
                 const data = d.data()
@@ -80,7 +69,6 @@ const GoogleSaveButtons = () => {
                   icon: <i className="fa-solid fa-check" />,
                   color: "green",
                 })
-                setRestoreLoading(false)
               })
               .catch((e) => {
                 notifications.show({
@@ -90,14 +78,13 @@ const GoogleSaveButtons = () => {
                   icon: <i className="fa-solid fa-exclamation" />,
                   color: "red",
                 })
-                setRestoreLoading(false)
               })
           }}
         >
           שחזור מגוגל
-        </Button>
+        </Menu.Item>
       </Tooltip>
-    </Button.Group>
+    </>
   )
 }
 

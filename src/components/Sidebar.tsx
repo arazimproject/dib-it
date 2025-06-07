@@ -1,13 +1,14 @@
 import {
+  ActionIcon,
   Autocomplete,
-  Button,
   Loader,
+  Menu,
   Select,
-  Switch,
   Tooltip,
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useEffect, useState } from "react"
+import autoBid from "../autoBid"
 import { useCourseInfo } from "../CourseInfoContext"
 import { useLocalStorage, useURLValue } from "../hooks"
 import { DibItCourse, useDibIt } from "../models"
@@ -73,96 +74,123 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
           החיפוש...
         </p>
       )}
-      <Select
-        mb={10}
-        value={semester}
-        onChange={(v) => {
-          if (v) {
-            dibIt.semester = v
-            setDibIt({ ...dibIt })
-          }
-        }}
-        data={Object.keys(generalInfo.semesters ?? {})
-          .sort()
-          .filter((semester) => semester >= FIRST_SEMESTER)
-          .map((key) => ({
-            value: key,
-            label: formatSemesterInHebrew(key),
-          }))}
-        label="סמסטר"
-        leftSection={<i className="fa-solid fa-cloud-moon" />}
-      />
-
-      <GoogleSaveButtons />
-
-      <Button.Group mb={10} style={{ width: "100%" }}>
-        <Tooltip label="הורידו קובץ JSON שמכיל את כל המערכות שלכם">
-          <Button
-            style={{ width: "50%" }}
-            leftSection={<i className="fa-solid fa-download" />}
-            onClick={() =>
-              downloadFile(
-                "dibit.json",
-                "data:text/json;charset=utf-8," +
-                  encodeURIComponent(JSON.stringify(dibIt))
-              )
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span>סמסטר:</span>
+        <Select
+          mr={5}
+          display="inline-block"
+          value={semester}
+          onChange={(v) => {
+            if (v) {
+              dibIt.semester = v
+              setDibIt({ ...dibIt })
             }
-          >
-            גיבוי
-          </Button>
-        </Tooltip>
-        <Button
-          style={{ width: "50%" }}
-          leftSection={<i className="fa-solid fa-upload" />}
-          onClick={async () => {
-            const state = await uploadJson()
-            setDibIt(state)
           }}
-        >
-          שחזור
-        </Button>
-      </Button.Group>
+          data={Object.keys(generalInfo.semesters ?? {})
+            .sort()
+            .filter((semester) => semester >= FIRST_SEMESTER)
+            .map((key) => ({
+              value: key,
+              label: formatSemesterInHebrew(key),
+            }))}
+          leftSection={<i className="fa-solid fa-cloud-moon" />}
+        />
 
-      <Button
-        fullWidth
-        leftSection={<i className="fa-solid fa-calendar" />}
-        color="blue"
-        style={{ flex: "none" }}
-        onClick={async () => {
-          const ics = await getICS(semester, currentCourses, courseInfo)
-          downloadFile(
-            "calendar.ics",
-            "data:text/calendar;charset=utf-8," + encodeURIComponent(ics)
-          )
-          notifications.show({
-            title: "הייצוא הושלם בהצלחה",
-            message:
-              "כעת עליכם לבצע ייבוא לקובץ ה-ICS שהורד. לחצו כאן כדי לפתוח את חלון הייבוא של Google Calendar.",
-            style: { direction: "rtl" },
-            icon: <i className="fa-solid fa-check" />,
-            color: "green",
-            styles: { body: { cursor: "pointer" } },
-            onClick: () => {
-              window.open(
-                "https://calendar.google.com/calendar/u/0/r/settings/export",
-                "_blank"
-              )
-            },
-          })
-        }}
-      >
-        ייצוא ל-Apple/Google Calendar
-      </Button>
-      <Button
-        mt="xs"
-        fullWidth
-        leftSection={<i className="fa-solid fa-print" />}
-        color="violet"
-        style={{ flex: "none" }}
-        onClick={window.print}
-      >
-        הדפסה/שמירה כ-PDF
-      </Button>
+        <span style={{ flexGrow: 1 }} />
+
+        <Menu>
+          <Menu.Target>
+            <Tooltip label="פעולות">
+              <ActionIcon size="lg" variant="light">
+                <i className="fa-solid fa-ellipsis-vertical" />
+              </ActionIcon>
+            </Tooltip>
+          </Menu.Target>
+
+          <Menu.Dropdown style={{ zIndex: 100000 }}>
+            <Tooltip label="הורידו קובץ JSON שמכיל את כל המערכות שלכם">
+              <Menu.Item
+                color="cyan"
+                leftSection={<i className="fa-solid fa-download" />}
+                onClick={() =>
+                  downloadFile(
+                    "dibit.json",
+                    "data:text/json;charset=utf-8," +
+                      encodeURIComponent(JSON.stringify(dibIt))
+                  )
+                }
+              >
+                גיבוי
+              </Menu.Item>
+            </Tooltip>
+            <Menu.Item
+              color="cyan"
+              leftSection={<i className="fa-solid fa-upload" />}
+              onClick={async () => {
+                const state = await uploadJson()
+                setDibIt(state)
+              }}
+            >
+              שחזור
+            </Menu.Item>
+
+            <GoogleSaveButtons />
+
+            <Menu.Item
+              color="blue"
+              leftSection={<i className="fa-solid fa-calendar" />}
+              onClick={async () => {
+                const ics = await getICS(semester, currentCourses, courseInfo)
+                downloadFile(
+                  "calendar.ics",
+                  "data:text/calendar;charset=utf-8," + encodeURIComponent(ics)
+                )
+                notifications.show({
+                  title: "הייצוא הושלם בהצלחה",
+                  message:
+                    "כעת עליכם לבצע ייבוא לקובץ ה-ICS שהורד. לחצו כאן כדי לפתוח את חלון הייבוא של Google Calendar.",
+                  style: { direction: "rtl" },
+                  icon: <i className="fa-solid fa-check" />,
+                  color: "green",
+                  styles: { body: { cursor: "pointer" } },
+                  onClick: () => {
+                    window.open(
+                      "https://calendar.google.com/calendar/u/0/r/settings/export",
+                      "_blank"
+                    )
+                  },
+                })
+              }}
+            >
+              ייצוא ל-Apple/Google Calendar
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<i className="fa-solid fa-print" />}
+              color="violet"
+              onClick={window.print}
+            >
+              הדפסה/שמירה כ-PDF
+            </Menu.Item>
+
+            <Menu.Item
+              leftSection={<i className="fa-solid fa-gavel" />}
+              color="red"
+              onClick={() => autoBid(currentCourses)}
+              // TODO: finish this
+              display="none"
+            >
+              המלצות בידינג אוטומטיות
+            </Menu.Item>
+
+            <Menu.Item
+              onClick={() => setCompactView(!compactView)}
+              leftSection={<i className="fa-solid fa-eye" />}
+            >
+              שינוי תצוגה ל{compactView ? "מלאה" : "קומפקטית"}
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </div>
 
       <Autocomplete
         size="md"
@@ -198,13 +226,6 @@ const Sidebar = ({ prefetching }: { prefetching: boolean }) => {
         placeholder="חיפוש קורסים להוספה"
         limit={20}
         maxDropdownHeight={300}
-      />
-
-      <Switch
-        mb="xs"
-        label={compactView ? "תצוגה קומפקטית" : "תצוגה מלאה"}
-        checked={compactView}
-        onChange={(e) => setCompactView(e.currentTarget.checked)}
       />
 
       {currentCourses.map((_, index) => (

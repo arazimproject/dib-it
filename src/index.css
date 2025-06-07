@@ -219,3 +219,7 @@ body,
 .mantine-Checkbox-input {
   cursor: pointer !important;
 }
+
+.mantine-Tooltip-tooltip {
+  z-index: 100000 !important;
+}
