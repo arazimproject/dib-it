@@ -140,9 +140,7 @@ const App = () => {
                         size="md"
                         variant={tab === "schedule" ? "light" : "subtle"}
                         leftSection={<i className="fa-solid fa-calendar" />}
-                        onClick={() =>
-                          setDibIt({ ...dibIt, tab: "schedule" }, true)
-                        }
+                        onClick={() => setDibIt({ ...dibIt, tab: "schedule" })}
                       >
                         מערכת
                       </Button>
@@ -152,9 +150,7 @@ const App = () => {
                         size="md"
                         variant={tab === "exams" ? "light" : "subtle"}
                         leftSection={<i className="fa-solid fa-list-check" />}
-                        onClick={() =>
-                          setDibIt({ ...dibIt, tab: "exams" }, true)
-                        }
+                        onClick={() => setDibIt({ ...dibIt, tab: "exams" })}
                       >
                         מבחנים
                       </Button>
@@ -165,7 +161,7 @@ const App = () => {
                         variant={tab === "study-plan" ? "light" : "subtle"}
                         leftSection={<i className="fa-solid fa-table-list" />}
                         onClick={() =>
-                          setDibIt({ ...dibIt, tab: "study-plan" }, true)
+                          setDibIt({ ...dibIt, tab: "study-plan" })
                         }
                       >
                         תוכנית
@@ -178,9 +174,7 @@ const App = () => {
                         leftSection={
                           <i className="fa-solid fa-graduation-cap" />
                         }
-                        onClick={() =>
-                          setDibIt({ ...dibIt, tab: "practice" }, true)
-                        }
+                        onClick={() => setDibIt({ ...dibIt, tab: "practice" })}
                       >
                         תרגול מבחנים
                       </Button>
@@ -190,9 +184,7 @@ const App = () => {
                         size="md"
                         variant={tab === "guide" ? "light" : "subtle"}
                         leftSection={<i className="fa-solid fa-info-circle" />}
-                        onClick={() =>
-                          setDibIt({ ...dibIt, tab: "guide" }, true)
-                        }
+                        onClick={() => setDibIt({ ...dibIt, tab: "guide" })}
                       >
                         מדריך
                       </Button>
@@ -202,9 +194,7 @@ const App = () => {
                         size="md"
                         variant={tab === "settings" ? "light" : "subtle"}
                         leftSection={<i className="fa-solid fa-gears" />}
-                        onClick={() =>
-                          setDibIt({ ...dibIt, tab: "settings" }, true)
-                        }
+                        onClick={() => setDibIt({ ...dibIt, tab: "settings" })}
                       >
                         הגדרות
                       </Button>
